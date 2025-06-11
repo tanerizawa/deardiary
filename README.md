@@ -104,7 +104,7 @@
 git clone https://github.com/yourusername/diary-depresiku.git
 cd diary-depresiku
 ./gradlew installDebug
-
+  bash
 ## Kontribusi
 Kami menyambut kontribusi dari komunitas. Silakan fork repositori ini, buat branch baru, dan kirim pull request. Pedoman kontribusi tersedia di CONTRIBUTING.md.
 
