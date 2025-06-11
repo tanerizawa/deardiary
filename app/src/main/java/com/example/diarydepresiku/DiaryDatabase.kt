@@ -6,6 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters // **PENTING: Import TypeConverters**
 import com.example.diarydepresiku.Converters
+import com.example.diarydepresiku.content.EducationalArticleEntity
 
 /**
  * DiaryDatabase: Kelas Room Database untuk aplikasi.
@@ -17,15 +18,18 @@ import com.example.diarydepresiku.Converters
  * @param typeConverters Mendaftarkan kelas TypeConverter untuk tipe data kustom.
  */
 @Database(
-    entities = [DiaryEntry::class],
-    version = 1, // Pastikan versi ini sesuai dengan versi database Anda
-    exportSchema = false // Atur ke true untuk produksi dan periksa file skema
+    entities = [DiaryEntry::class, EducationalArticleEntity::class],
+    version = 2,
+    exportSchema = false
 )
 @TypeConverters(Converters::class) // **PENTING: Daftarkan kelas TypeConverter di sini**
 abstract class DiaryDatabase : RoomDatabase() {
 
     // DAO (Data Access Object) untuk interaksi dengan entitas DiaryEntry
     abstract fun diaryDao(): DiaryDao
+
+    // DAO untuk artikel edukasi yang disimpan secara lokal
+    abstract fun educationalArticleDao(): com.example.diarydepresiku.content.EducationalArticleDao
 
     companion object {
         @Volatile // Memastikan variabel ini selalu up-to-date di semua thread
