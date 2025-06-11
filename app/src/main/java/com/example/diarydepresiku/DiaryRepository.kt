@@ -2,6 +2,7 @@ package com.example.diarydepresiku
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.Flow
 import java.util.concurrent.TimeUnit // Untuk penggunaan waktu yang lebih jelas
 
 // Repository bertanggung jawab untuk abstraksi akses data (lokal & remote)
