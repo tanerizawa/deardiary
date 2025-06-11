@@ -1,5 +1,17 @@
+package com.example.diarydepresiku.ui
+
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import com.example.diarydepresiku.DiaryViewModel
+import com.example.diarydepresiku.moodOptions
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun DiaryFormScreen(viewModel: DiaryViewModel, modifier: Modifier = Modifier) {
@@ -9,6 +21,7 @@ fun DiaryFormScreen(viewModel: DiaryViewModel, modifier: Modifier = Modifier) {
     // Mengamati daftar entri dari ViewModel
     val diaryEntries by viewModel.diaryEntries.collectAsState()
     val statusMessage by viewModel.statusMessage.collectAsState()
+    val dateFormat = remember { SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.getDefault()) }
 
     Column(modifier = modifier.padding(16.dp)) {
         // ... (UI Anda untuk form input) ...
@@ -39,7 +52,8 @@ fun DiaryFormScreen(viewModel: DiaryViewModel, modifier: Modifier = Modifier) {
         } else {
             Column {
                 diaryEntries.takeLast(3).forEach { entry -> // Tampilkan 3 entri terakhir
-                    Text("(${entry.date}) Mood: ${entry.mood} - ${entry.content.take(50)}...")
+                    val date = dateFormat.format(Date(entry.creationTimestamp))
+                    Text("($date) Mood: ${entry.mood} - ${entry.content.take(50)}...")
                 }
             }
         }
