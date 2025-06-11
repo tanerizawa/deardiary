@@ -46,7 +46,7 @@ crashlytics-build.properties
 fabric.properties
 
 # == Common IDE and OS Files ==
-.DS_Store          # MacOS generated files
+*.DS_Store         # MacOS generated files
 Thumbs.db          # Windows generated files
 *.log
 *.bak
