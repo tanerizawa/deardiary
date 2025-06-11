@@ -18,6 +18,9 @@ android {
         versionCode = 1
         versionName = "1.0"
 
+        // Base URL for backend API
+        buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8000/\"")
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
@@ -46,6 +49,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         // >>> PENTING: Link ke versi compiler dari libs.versions.toml
