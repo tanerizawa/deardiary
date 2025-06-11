@@ -19,8 +19,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.diarydepresiku.ContentViewModel
 import com.example.diarydepresiku.content.EducationalArticle
-import androidx.compose.material3.MaterialTheme
-
 @Composable
 fun EducationalContentScreen(
     viewModel: ContentViewModel,
