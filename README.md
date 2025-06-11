@@ -105,6 +105,33 @@ git clone https://github.com/yourusername/diary-depresiku.git
 cd diary-depresiku
 ./gradlew installDebug
 ```
+
+## Konfigurasi Build
+
+Secara default aplikasi menggunakan URL `http://10.0.2.2:8000/` untuk mengakses
+backend. Nilai ini didefinisikan di `app/build.gradle.kts` melalui `buildConfigField`:
+
+```kotlin
+defaultConfig {
+    buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8000/\"")
+}
+```
+
+Anda bisa menimpa nilai tersebut pada setiap `buildType` misalnya:
+
+```kotlin
+buildTypes {
+    debug {
+        buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8000/\"")
+    }
+    release {
+        buildConfigField("String", "BASE_URL", "\"https://api.example.com/\"")
+    }
+}
+```
+
+Gunakan `BuildConfig.BASE_URL` di kode Kotlin untuk memperoleh URL yang sesuai
+dengan jenis build.
 ## Kontribusi
 Kami menyambut kontribusi dari komunitas. Silakan fork repositori ini, buat branch baru, dan kirim pull request. Pedoman kontribusi tersedia di CONTRIBUTING.md.
 

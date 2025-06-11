@@ -10,6 +10,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import com.example.diarydepresiku.content.NewsApiService
 import com.example.diarydepresiku.content.EducationalArticleDao
 import com.example.diarydepresiku.content.ContentRepository
+import com.example.diarydepresiku.BuildConfig
 
 class MyApplication : Application() {
 
@@ -30,7 +31,7 @@ class MyApplication : Application() {
     // Lazy initialization untuk Retrofit
     val retrofit: Retrofit by lazy {
         Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:8000/") // PASTIKAN URL INI BENAR (emulator: 10.0.2.2, device: IP lokal Anda)
+            .baseUrl(BuildConfig.BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
