@@ -16,6 +16,11 @@ import com.example.diarydepresiku.ui.theme.DiarydepresikuTheme
 import com.example.diarydepresiku.ui.DiaryFormScreen // <<< PENTING: Import ini dari package ui
 import com.example.diarydepresiku.ui.MoodAnalysisScreen
 import androidx.navigation.compose.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.Icon
+import androidx.compose.material.icons.filled.Insights
+
 
 // Hapus definisi 'moodOptions' jika sudah ada di DiaryFormScreen.kt atau tempat lain yang lebih tepat.
 // val moodOptions = listOf("Senang", "Tersipu", "Sedih", "Cemas", "Marah")
@@ -42,24 +47,28 @@ class MainActivity : ComponentActivity() {
                                 selected = currentRoute == "form",
                                 onClick = {
                                     navController.navigate("form") {
-                                        popUpTo("form") { inclusive = false }
+                                        popUpTo(navController.graph.startDestinationId) { inclusive = false }
                                         launchSingleTop = true
                                     }
                                 },
+                                icon = { Icon(Icons.Default.Edit, contentDescription = "Diary") },
                                 label = { Text("Diary") },
                                 alwaysShowLabel = true
                             )
+
                             NavigationBarItem(
                                 selected = currentRoute == "analysis",
                                 onClick = {
                                     navController.navigate("analysis") {
-                                        popUpTo("form") { inclusive = false }
+                                        popUpTo(navController.graph.startDestinationId) { inclusive = false }
                                         launchSingleTop = true
                                     }
                                 },
+                                icon = { Icon(Icons.Filled.Insights, contentDescription = "Analysis") },
                                 label = { Text("Analysis") },
                                 alwaysShowLabel = true
                             )
+
                         }
                     }
                 ) { innerPadding ->
