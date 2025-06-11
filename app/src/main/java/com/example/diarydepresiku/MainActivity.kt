@@ -12,22 +12,19 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.diarydepresiku.ui.theme.DiarydepresikuTheme
-import com.example.diarydepresiku.ui.DiaryFormScreen // <<< PENTING: Import ini dari package ui
-import com.example.diarydepresiku.ui.MoodAnalysisScreen
-import com.example.diarydepresiku.ui.EducationalContentScreen
 import androidx.navigation.compose.*
+
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.Icon
 import androidx.compose.material.icons.filled.Insights
-import androidx.compose.material.icons.filled.Article
+import androidx.compose.material.icons.automirrored.filled.Article // ✅ Gunakan versi AutoMirrored
+
+import com.example.diarydepresiku.ui.theme.DiarydepresikuTheme
+import com.example.diarydepresiku.ui.DiaryFormScreen
+import com.example.diarydepresiku.ui.MoodAnalysisScreen
+import com.example.diarydepresiku.ui.EducationalContentScreen
 import com.example.diarydepresiku.ContentViewModel
 import com.example.diarydepresiku.ContentViewModelFactory
-
-
-// Hapus definisi 'moodOptions' jika sudah ada di DiaryFormScreen.kt atau tempat lain yang lebih tepat.
-// val moodOptions = listOf("Senang", "Tersipu", "Sedih", "Cemas", "Marah")
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,17 +32,21 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val application = LocalContext.current.applicationContext as MyApplication
-            val factory = DiaryViewModelFactory(application = application)
-            val diaryViewModel: DiaryViewModel = viewModel(factory = factory)
+            val diaryFactory = DiaryViewModelFactory(application = application)
+            val diaryViewModel: DiaryViewModel = viewModel(factory = diaryFactory)
 
             val contentFactory = ContentViewModelFactory(
                 repository = application.contentRepository,
                 diaryViewModel = diaryViewModel
             )
             val contentViewModel: ContentViewModel = viewModel(factory = contentFactory)
+
+            // Refresh konten artikel saat pertama kali dibuka
             LaunchedEffect(Unit) {
                 contentViewModel.refreshArticles()
             }
+
+            // Update artikel berdasarkan statistik mood
             LaunchedEffect(Unit) {
                 diaryViewModel.moodCounts.collect { stats ->
                     contentViewModel.updateMoodStats(stats)
@@ -70,11 +71,10 @@ class MainActivity : ComponentActivity() {
                                         launchSingleTop = true
                                     }
                                 },
-                                icon = { Icon(Icons.Default.Edit, contentDescription = "Diary") },
+                                icon = { Icon(Icons.Filled.Edit, contentDescription = "Diary") },
                                 label = { Text("Diary") },
                                 alwaysShowLabel = true
                             )
-
                             NavigationBarItem(
                                 selected = currentRoute == "analysis",
                                 onClick = {
@@ -87,7 +87,6 @@ class MainActivity : ComponentActivity() {
                                 label = { Text("Analysis") },
                                 alwaysShowLabel = true
                             )
-
                             NavigationBarItem(
                                 selected = currentRoute == "content",
                                 onClick = {
@@ -96,11 +95,10 @@ class MainActivity : ComponentActivity() {
                                         launchSingleTop = true
                                     }
                                 },
-                                icon = { Icon(Icons.Default.Article, contentDescription = "Content") },
+                                icon = { Icon(Icons.AutoMirrored.Filled.Article, contentDescription = "Content") },
                                 label = { Text("Content") },
                                 alwaysShowLabel = true
                             )
-
                         }
                     }
                 ) { innerPadding ->
@@ -130,22 +128,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
-// Hapus fungsi DiaryFormScreen, moodOptions, dan Preview yang ada di sini
-// jika Anda sudah memindahkannya ke DiaryFormScreen.kt
-/*
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DiaryFormScreen(
-    viewModel: DiaryViewModel,
-    modifier: Modifier = Modifier
-) {
-    // ... semua kode form di sini ...
-}
-
-@Preview(showBackground = true, widthDp = 320)
-@Composable
-fun DiaryFormScreenPreview() {
-    // ... kode preview ...
-}
-*/
