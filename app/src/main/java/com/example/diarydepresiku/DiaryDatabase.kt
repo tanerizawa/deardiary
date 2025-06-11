@@ -5,6 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters // **PENTING: Import TypeConverters**
+import com.example.diarydepresiku.Converters
 
 /**
  * DiaryDatabase: Kelas Room Database untuk aplikasi.
