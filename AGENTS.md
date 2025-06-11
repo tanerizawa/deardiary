@@ -1,0 +1,24 @@
+# Development Guidelines
+
+## Build the Android app
+Run:
+```bash
+./gradlew assembleDebug
+```
+
+## Run Android unit tests
+Run:
+```bash
+./gradlew test
+```
+
+## Start the FastAPI backend
+From the project root, run:
+```bash
+cd app/backend_api && uvicorn app.main:app --reload
+```
+
+## General guidelines
+- Run any configured formatters before committing code.
+- Do **not** commit OS artifacts such as `.DS_Store` or `Thumbs.db`.
+- Ensure every file ends with a trailing newline.
