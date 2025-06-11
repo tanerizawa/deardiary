@@ -104,6 +104,9 @@
 git clone https://github.com/yourusername/diary-depresiku.git
 cd diary-depresiku
 ./gradlew installDebug
+cd app/backend_api
+pip install -r requirements.txt
+uvicorn app.main:app --reload
 ```
 
 ## Konfigurasi Build
