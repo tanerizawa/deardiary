@@ -44,16 +44,12 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
     private val _moodCounts = MutableStateFlow<Map<String, Int>>(emptyMap())
     val moodCounts: StateFlow<Map<String, Int>> = _moodCounts.asStateFlow()
 
-    // Inisialisasi logika pengumpulan dan penghitungan mood
+    // Inisialisasi pengambilan statistik mood dari backend
     init {
         viewModelScope.launch {
-            repository.getAllEntries().collect { entries ->
-                // Peta untuk menyimpan hitungan setiap mood
-                val counts = mutableMapOf<String, Int>()
-                for (entry in entries) {
-                    counts[entry.mood] = (counts[entry.mood] ?: 0) + 1
-                }
-                _moodCounts.value = counts
+            val stats = repository.getMoodStats()
+            if (stats != null) {
+                _moodCounts.value = stats
             }
         }
     }
@@ -72,6 +68,11 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
                 repository.addEntry(content, mood) // <<< KOREKSI: Panggil addEntry di repository
                 // Memberikan feedback sukses ke UI
                 _statusMessage.value = "Entri berhasil disimpan!"
+                // Perbarui statistik mood setelah menambah entri
+                val stats = repository.getMoodStats()
+                if (stats != null) {
+                    _moodCounts.value = stats
+                }
                 // Reset pesan setelah beberapa waktu jika diperlukan
                 launch {
                     kotlinx.coroutines.delay(3000) // Tunda 3 detik

@@ -59,6 +59,28 @@ class DiaryRepository(
         return diaryDao.getAllEntries()
     }
 
+    /**
+     * Meminta statistik mood dari backend.
+     * @return Map<String, Int> berisi jumlah entri untuk tiap mood, atau null jika gagal.
+     */
+    suspend fun getMoodStats(): Map<String, Int>? {
+        return withContext(Dispatchers.IO) {
+            try {
+                val response = diaryApi.getMoodStats()
+                if (response.isSuccessful) {
+                    response.body()?.stats
+                } else {
+                    val errorBody = response.errorBody()?.string()
+                    println("Failed to fetch mood stats: ${response.code()} - $errorBody")
+                    null
+                }
+            } catch (e: Exception) {
+                println("Network error fetching mood stats: ${e.message}")
+                null
+            }
+        }
+    }
+
     // TODO: Tambahkan fungsi lain untuk CRUD (update, delete, getById) jika diperlukan
     // suspend fun updateEntry(entry: DiaryEntry) = withContext(Dispatchers.IO) { diaryDao.updateEntry(entry) }
     // suspend fun deleteEntry(entry: DiaryEntry) = withContext(Dispatchers.IO) { diaryDao.deleteEntry(entry) }

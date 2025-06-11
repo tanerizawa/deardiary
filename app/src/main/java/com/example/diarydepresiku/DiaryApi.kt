@@ -3,6 +3,7 @@ package com.example.diarydepresiku
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
+import retrofit2.http.GET
 import com.google.gson.annotations.SerializedName // Penting untuk mapping JSON
 
 /**
@@ -28,6 +29,11 @@ data class DiaryEntryResponse(
     @SerializedName("message") val message: String? = null // Contoh properti opsional dari server
 )
 
+/** Data class untuk hasil statistik mood dari server. */
+data class MoodStatsResponse(
+    @SerializedName("stats") val stats: Map<String, Int>
+)
+
 /**
  * DiaryApi: Interface Retrofit untuk berkomunikasi dengan backend FastAPI.
  * Mendefinisikan semua endpoint API yang akan digunakan aplikasi.
@@ -42,6 +48,13 @@ interface DiaryApi {
     @POST("entries/") // Pastikan ini adalah endpoint yang benar di server FastAPI Anda.
     // Saya menambahkan trailing slash '/' karena umum di REST API.
     suspend fun postEntry(@Body entry: DiaryEntryRequest): Response<DiaryEntryResponse>
+
+    /**
+     * Endpoint untuk mendapatkan statistik mood dari server.
+     * @return Objek Response yang membungkus MoodStatsResponse.
+     */
+    @GET("stats/")
+    suspend fun getMoodStats(): Response<MoodStatsResponse>
 
     // (Opsional) Endpoint lain dapat didefinisikan di sini, misalnya:
     // @GET("entries/")
