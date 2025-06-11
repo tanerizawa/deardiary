@@ -3,15 +3,15 @@ package com.example.diarydepresiku
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Dispatchers // Mungkin tidak langsung terpakai di sini, tapi bagus untuk ada
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.map // Diperlukan untuk transformasi Flow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withContext // Mungkin tidak langsung terpakai di sini
 
 /**
  * DiaryViewModel: Mengelola UI state dan berinteraksi dengan Repository untuk operasi data.
@@ -23,21 +23,42 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
 
     // Inisialisasi repository menggunakan instance yang disediakan oleh Application
     // Ini adalah bentuk sederhana dari Dependency Injection
+    // Pastikan MyApplication mengekspos properti 'diaryRepository'
     private val repository: DiaryRepository = (application as MyApplication).diaryRepository
 
     // UI State: Mengelola daftar entri diary yang akan diobservasi oleh UI
-    // Mengubah Flow dari repository menjadi StateFlow untuk observasi Compose
     val diaryEntries: StateFlow<List<DiaryEntry>> =
-        repository.getAllDiaryEntries()
+        repository.getAllEntries() // <<< KOREKSI: Gunakan getAllEntries()
             .stateIn(
                 scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000), // Mulai berbagi data saat ada subscriber (UI)
-                initialValue = emptyList() // Nilai awal sebelum data dimuat
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = emptyList()
             )
 
     // State untuk pesan status atau error yang bisa ditampilkan ke UI
     private val _statusMessage = MutableStateFlow<String?>(null)
     val statusMessage: StateFlow<String?> = _statusMessage.asStateFlow()
+
+    // <<< TAMBAHAN UNTUK ANALISIS MOOD >>>
+    // State untuk menampung hitungan mood (Map<MoodName, Count>)
+    private val _moodCounts = MutableStateFlow<Map<String, Int>>(emptyMap())
+    val moodCounts: StateFlow<Map<String, Int>> = _moodCounts.asStateFlow()
+
+    // Inisialisasi logika pengumpulan dan penghitungan mood
+    init {
+        viewModelScope.launch {
+            repository.getAllEntries().collect { entries ->
+                // Peta untuk menyimpan hitungan setiap mood
+                val counts = mutableMapOf<String, Int>()
+                for (entry in entries) {
+                    counts[entry.mood] = (counts[entry.mood] ?: 0) + 1
+                }
+                _moodCounts.value = counts
+            }
+        }
+    }
+    // <<< AKHIR TAMBAHAN UNTUK ANALISIS MOOD >>>
+
 
     /**
      * Fungsi untuk menyimpan entri diary baru.
@@ -47,9 +68,8 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
     fun saveEntry(content: String, mood: String) {
         // Meluncurkan coroutine dalam viewModelScope
         viewModelScope.launch {
-            // Operasi Repository sudah suspend dan akan menggunakan IO Dispatcher yang sesuai
             try {
-                repository.addEntry(content, mood)
+                repository.addEntry(content, mood) // <<< KOREKSI: Panggil addEntry di repository
                 // Memberikan feedback sukses ke UI
                 _statusMessage.value = "Entri berhasil disimpan!"
                 // Reset pesan setelah beberapa waktu jika diperlukan

@@ -1,25 +1,25 @@
+// app/build.gradle.kts
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    // KSP versi harus sesuai dengan versi Kotlin yang digunakan
-    id("com.google.devtools.ksp") version "2.0.21-1.0.28"
-    // Ganti dengan versi terbaru KSP yang sesuai dengan Kotlin Anda
+    alias(libs.plugins.ksp) // <<< GUNAKAN ALIAS INI jika sudah didefinisikan di libs.versions.toml
 }
 
 android {
     namespace = "com.example.diarydepresiku"
-    compileSdk = 35
+    compileSdk = 35 // OK
 
     defaultConfig {
         applicationId = "com.example.diarydepresiku"
-        minSdk = 24 // OK
+        minSdk = 24
         targetSdk = 35
-        versionCode = 1 // OK
-        versionName = "1.0" // OK
+        versionCode = 1
+        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables { // Tambahkan ini jika menggunakan Vector Drawables
+        vectorDrawables {
             useSupportLibrary = true
         }
     }
@@ -34,21 +34,20 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11 // OK
-        targetCompatibility = JavaVersion.VERSION_11 // OK
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = "11" // OK
+        jvmTarget = "11"
     }
     buildFeatures {
-        compose = true // OK
-        // viewBinding = true // Tambahkan ini jika Anda juga menggunakan View Binding
+        compose = true
     }
-    composeOptions { // Tambahkan ini untuk konfigurasi Compose
-        kotlinCompilerExtensionVersion = "1.5.15"
-        // Anda mungkin perlu menyesuaikannya dengan compileSdk dan Kotlin plugin
+    composeOptions {
+        // >>> PENTING: Link ke versi compiler dari libs.versions.toml
+        kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
     }
-    packaging { // Konfigurasi untuk mencegah konflik file di APK
+    packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
@@ -56,58 +55,43 @@ android {
 }
 
 dependencies {
-
-    implementation(libs.androidx.core.ktx) // OK
-    implementation(libs.androidx.lifecycle.runtime.ktx) // OK
-    implementation(libs.androidx.activity.compose) // OK
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom)) // OK
-    implementation(libs.androidx.ui) // OK
-    implementation(libs.androidx.ui.graphics) // OK
-    implementation(libs.androidx.ui.tooling.preview) // OK
-    implementation(libs.androidx.material3) // OK
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.ui.tooling.preview)
+    implementation(libs.androidx.material3)
+
+    // >>> PENTING: Gunakan referensi libs. untuk google-fonts
+    implementation(libs.androidx.ui.text.google.fonts)
 
     // ---- Tambahan untuk Room Database ----
-    val room_version = "2.6.1" // Gunakan versi Room terbaru yang stabil
-
-    implementation("androidx.room:room-runtime:$room_version")
-    annotationProcessor("androidx.room:room-compiler:$room_version") // Untuk KAPT (lama)
-    // Jika menggunakan KSP (direkomendasikan untuk Kotlin), ganti baris di atas dengan ini:
-    ksp("androidx.room:room-compiler:$room_version") // Pastikan Anda juga menambahkan plugin KSP di atas
-
-    // Kotlin Extensions and Coroutines support for Room
-    implementation("androidx.room:room-ktx:$room_version")
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler) // Untuk KSP (gunakan alias)
+    implementation(libs.androidx.room.ktx)
 
     // ---- Tambahan untuk Lifecycle/ViewModel ----
-    val lifecycle_version = "2.7.0" // Gunakan versi Lifecycle terbaru yang stabil
-
-    // ViewModel utilities for Compose
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version")
-    // ViewModel utilities for Android KTX
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version")
-    // LiveData (opsional, jika Anda masih menggunakannya)
-    // implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version")
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
 
     // ---- Tambahan untuk Retrofit (Jaringan) ----
-    val retrofit_version = "2.9.0" // Gunakan versi Retrofit terbaru yang stabil
-    val okhttp_version = "4.12.0" // Versi OkHttp yang compatible dengan Retrofit
-
-    implementation("com.squareup.retrofit2:retrofit:$retrofit_version")
-    implementation("com.squareup.retrofit2:converter-gson:$retrofit_version") // Untuk konversi JSON (Gson)
-    implementation("com.squareup.okhttp3:okhttp:$okhttp_version") // OkHttp (HTTP client)
-    implementation("com.squareup.okhttp3:logging-interceptor:$okhttp_version") // Interceptor untuk logging (membantu debugging)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.gson)
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging.interceptor)
 
     // ---- Kotlin Coroutines Core ----
-    // Menambahkan dependensi eksplisit untuk coroutines
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.android)
 
-
-    // ---- Dependensi pengujian (sudah ada, hanya peninjauan) ----
-    testImplementation(libs.junit) // OK
-    androidTestImplementation(libs.androidx.junit) // OK
-    androidTestImplementation(libs.androidx.espresso.core) // OK
-    androidTestImplementation(platform(libs.androidx.compose.bom)) // OK
-    androidTestImplementation(libs.androidx.ui.test.junit4) // OK
-    debugImplementation(libs.androidx.ui.tooling) // OK
-    debugImplementation(libs.androidx.ui.test.manifest) // OK
+    // ---- Dependensi pengujian ----
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+    debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
 }
