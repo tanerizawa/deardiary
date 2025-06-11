@@ -46,6 +46,12 @@ class MainActivity : ComponentActivity() {
             LaunchedEffect(Unit) {
                 contentViewModel.refreshArticles()
             }
+            LaunchedEffect(Unit) {
+                diaryViewModel.moodCounts.collect { stats ->
+                    contentViewModel.updateMoodStats(stats)
+                    contentViewModel.refreshArticles()
+                }
+            }
 
             DiarydepresikuTheme {
                 val navController = rememberNavController()
