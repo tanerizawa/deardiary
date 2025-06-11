@@ -9,12 +9,12 @@ plugins {
 
 android {
     namespace = "com.example.diarydepresiku"
-    compileSdk = 35 // OK
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.example.diarydepresiku"
         minSdk = 24 // OK
-        targetSdk = 35 // OK
+        targetSdk = 34
         versionCode = 1 // OK
         versionName = "1.0" // OK
 
@@ -45,7 +45,7 @@ android {
         // viewBinding = true // Tambahkan ini jika Anda juga menggunakan View Binding
     }
     composeOptions { // Tambahkan ini untuk konfigurasi Compose
-        kotlinCompilerExtensionVersion = "1.5.1" // Pastikan versi ini sesuai dengan versi Kotlin Anda
+        kotlinCompilerExtensionVersion = "1.5.15"
         // Anda mungkin perlu menyesuaikannya dengan compileSdk dan Kotlin plugin
     }
     packaging { // Konfigurasi untuk mencegah konflik file di APK
