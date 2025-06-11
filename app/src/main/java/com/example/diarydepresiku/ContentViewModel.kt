@@ -22,6 +22,19 @@ class ContentViewModel(
     private val _articles = MutableStateFlow<List<EducationalArticle>>(emptyList())
     val articles: StateFlow<List<EducationalArticle>> = _articles.asStateFlow()
 
+    private val _dominantMood = MutableStateFlow<String?>(null)
+    val dominantMood: StateFlow<String?> = _dominantMood.asStateFlow()
+
+    private val _highlightMood = MutableStateFlow<String?>(null)
+    val highlightMood: StateFlow<String?> = _highlightMood.asStateFlow()
+
+    /**
+     * Diperbarui dari [DiaryViewModel] untuk menyimpan statistik mood terkini.
+     */
+    fun updateMoodStats(stats: Map<String, Int>) {
+        _dominantMood.value = stats.maxByOrNull { it.value }?.key
+    }
+
     /**
      * Mengambil artikel terbaru dari repository.
      * Jika [filterMood] diberikan atau terdapat mood dominan dari [DiaryViewModel],
@@ -30,15 +43,21 @@ class ContentViewModel(
     fun refreshArticles(filterMood: String? = null) {
         viewModelScope.launch {
             val mood = filterMood
+                ?: _dominantMood.value
                 ?: diaryViewModel?.moodCounts?.value?.maxByOrNull { it.value }?.key
+
             val allArticles = repository.getArticles(apiKey = "")
-            _articles.value = if (mood.isNullOrBlank()) {
-                allArticles
+            if (mood.isNullOrBlank()) {
+                _articles.value = allArticles
+                _highlightMood.value = null
             } else {
-                allArticles.filter { article ->
+                val matched = allArticles.filter { article ->
                     article.title?.contains(mood, ignoreCase = true) == true ||
                         article.description?.contains(mood, ignoreCase = true) == true
                 }
+                val others = allArticles.filterNot { matched.contains(it) }
+                _articles.value = matched + others
+                _highlightMood.value = mood
             }
         }
     }

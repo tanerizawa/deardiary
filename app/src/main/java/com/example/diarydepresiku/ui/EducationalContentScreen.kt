@@ -13,12 +13,13 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.diarydepresiku.ContentViewModel
 import com.example.diarydepresiku.content.EducationalArticle
-import androidx.compose.runtime.collectAsState
+import androidx.compose.material3.MaterialTheme
 
 @Composable
 fun EducationalContentScreen(
@@ -26,6 +27,7 @@ fun EducationalContentScreen(
     modifier: Modifier = Modifier
 ) {
     val articles = viewModel.articles.collectAsState().value
+    val highlightMood = viewModel.highlightMood.collectAsState().value
     val context = LocalContext.current
 
     LazyColumn(
@@ -34,7 +36,11 @@ fun EducationalContentScreen(
             .padding(16.dp)
     ) {
         items(articles) { article ->
-            ArticleItem(article = article) { url ->
+            val highlighted = highlightMood != null && (
+                article.title?.contains(highlightMood, ignoreCase = true) == true ||
+                    article.description?.contains(highlightMood, ignoreCase = true) == true
+            )
+            ArticleItem(article = article, isHighlighted = highlighted) { url ->
                 url?.let {
                     val intent = Intent(Intent.ACTION_VIEW, Uri.parse(it))
                     context.startActivity(intent)
@@ -45,12 +51,22 @@ fun EducationalContentScreen(
 }
 
 @Composable
-private fun ArticleItem(article: EducationalArticle, onOpen: (String?) -> Unit) {
+private fun ArticleItem(
+    article: EducationalArticle,
+    isHighlighted: Boolean,
+    onOpen: (String?) -> Unit
+) {
     Card(
         modifier = Modifier
             .padding(vertical = 8.dp)
             .clickable { onOpen(article.url) },
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        colors = CardDefaults.cardColors(
+            containerColor = if (isHighlighted) {
+                MaterialTheme.colorScheme.secondaryContainer
+            } else {
+                MaterialTheme.colorScheme.surface
+            }
+        )
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(text = article.title.orEmpty(), style = MaterialTheme.typography.titleMedium)
