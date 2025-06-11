@@ -64,6 +64,19 @@ class MainActivity : ComponentActivity() {
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
+                    floatingActionButton = {
+                        FloatingActionButton(
+                            onClick = {
+                                navController.navigate("form") {
+                                    popUpTo(navController.graph.startDestinationId) { inclusive = false }
+                                    launchSingleTop = true
+                                }
+                            }
+                        ) {
+                            Icon(Icons.Filled.Edit, contentDescription = "New Entry")
+                        }
+                    },
+                    floatingActionButtonPosition = FabPosition.Center,
                     bottomBar = {
                         NavigationBar {
                             NavigationBarItem(
