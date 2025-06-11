@@ -1,33 +1,118 @@
-# DearDiary
+# Diary Depresiku
 
-This repository contains an Android application and a small FastAPI backend used for storing diary entries.
+**Diary Depresiku** adalah aplikasi Android yang dirancang untuk membantu pengguna memantau suasana hati dan kesehatan mental melalui pencatatan harian dan analisis berbasis kecerdasan buatan (AI). Aplikasi ini mengintegrasikan data emosi, aktivitas fisik, dan rekomendasi konten secara personal, dengan fokus pada privasi, kemudahan penggunaan, dan pendekatan berbasis bukti.
 
-## Android setup
+## Fitur Utama
 
-1. Install **Android Studio** (AGP 8.1+).
-2. Clone this repository and open the project in Android Studio.
-3. Android Studio will automatically download the Gradle wrapper and all required dependencies.
-4. Click **Run** or use `./gradlew assembleDebug` from the command line to build the app.
-5. The Retrofit base URL is defined in `MyApplication.kt`. The default value points to `http://10.0.2.2:8000/` for an Android emulator. Adjust it if you run the backend elsewhere.
+### Minimum Viable Product (MVP)
 
-## FastAPI backend
+- **Pencatatan Emosi Harian**  
+  Pengguna dapat menulis catatan bebas serta memilih mood melalui skala atau emotikon. Formulir opsional seperti aktivitas harian dan tingkat stres juga tersedia.
 
-1. Make sure **Python 3.10+** is installed.
-2. Create a virtual environment and activate it:
-   ```bash
-   cd app/backend_api
-   python -m venv venv
-   source venv/bin/activate
-   ```
-3. Install the required packages:
-   ```bash
-   pip install -r requirements.txt
-   ```
-4. Start the development server from the `app/backend_api` directory:
-   ```bash
-   uvicorn app.main:app --reload
-   ```
-   The API will be available at `http://localhost:8000`.
+- **Pelacakan Aktivitas dan Lokasi**  
+  Aktivitas fisik dan lokasi pengguna tercatat secara otomatis (dengan izin), memberi konteks pada kondisi emosional harian.
 
-The backend uses an SQLite database (`diary.db`) created automatically in the backend directory. There are no required environment variables.
-The source code lives in `app/backend_api/app`, which includes an `__init__.py` file so it can be imported as the `app` package.
+- **Integrasi Data Kesehatan**  
+  Dukungan terhadap Google Fit memungkinkan pengambilan data langkah, detak jantung, dan aktivitas lainnya secara aman.
+
+- **Analisis Emosi Berbasis AI**  
+  Catatan pengguna dianalisis menggunakan model NLP untuk mengidentifikasi pola emosi dan menyarankan konten yang sesuai.
+
+- **Rekomendasi Konten Personal**  
+  Berdasarkan hasil analisis, sistem menyarankan artikel, latihan relaksasi, atau tips kesehatan mental secara relevan.
+
+- **Sinkronisasi dan Mode Offline**  
+  Data dicatat secara lokal dan disinkronkan otomatis ke server saat koneksi tersedia.
+
+- **Antarmuka Minimalis**  
+  UI dirancang sederhana, bersih, dan menenangkan, menggunakan palet warna pastel dan struktur navigasi intuitif.
+
+## Rencana Pengembangan Lanjutan
+
+- Fitur konsultasi daring dengan psikolog
+- Analisis lanjutan (grafik mood, insight perilaku)
+- Dukungan wearable (Wear OS, sleep tracking)
+- Sistem rekomendasi berbasis pembelajaran mesin
+- Keamanan lanjutan (enkripsi end-to-end, autentikasi biometrik)
+- Versi iOS dan platform lintas perangkat
+
+## Arsitektur dan Teknologi
+
+### Client-Side (Android)
+- **Bahasa**: Kotlin
+- **Framework**: Jetpack Compose
+- **Penyimpanan Lokal**: Room (SQLite)
+- **API Kesehatan**: Google Fit API
+- **Networking**: Retrofit
+- **Analisis AI Lokal (opsional)**: TensorFlow Lite
+
+### Server-Side (Backend)
+- **Bahasa**: Python (FastAPI)
+- **Database**: PostgreSQL / MongoDB
+- **AI Processing**: OpenAI GPT API
+- **Authentication**: OAuth 2.0 / JWT
+- **Deployment**: AWS / GCP / Render
+
+## Alur Pengguna
+
+1. Login atau registrasi akun.
+2. Menulis catatan harian beserta detail mood dan aktivitas.
+3. Data disimpan dan dianalisis oleh server.
+4. Pengguna menerima insight atau rekomendasi konten.
+5. Riwayat jurnal dapat diakses dan ditinjau kembali.
+6. Notifikasi pengingat dikirim setiap hari secara terjadwal.
+
+## Desain UI/UX
+
+- **Warna**: Biru muda, hijau mint, dan oranye pastel sebagai aksen.
+- **Font**: Roboto / Open Sans.
+- **Struktur Navigasi**: Bottom tab bar (Diary, Riwayat, Profil).
+- **Fokus Desain**: Kesederhanaan, keterbacaan, dan kenyamanan visual.
+
+## Pengujian dan Validasi
+
+- **Unit Testing**: Fungsi aplikasi diuji secara modular.
+- **Instrumented UI Testing**: Menggunakan Espresso dan Automator.
+- **Beta Testing Tertutup**: Uji nyata dengan pengguna terbatas.
+- **Audit Keamanan**: Uji penetrasi dasar dan pengujian enkripsi data.
+- **Validasi Klinis**: Kolaborasi dengan profesional psikologi untuk memastikan intervensi aman dan sesuai.
+
+## Roadmap Pengembangan
+
+### Tahun Pertama
+- Q1: Riset dan desain UI/UX
+- Q2: Implementasi fitur inti dan backend
+- Q3: Pengujian beta, penyempurnaan, dan validasi AI
+- Q4: Peluncuran terbatas (closed/open beta)
+
+### Tahun Kedua
+- Pengembangan fitur lanjutan
+- Pembentukan tim pengembang dan psikolog
+- Strategi komersialisasi (freemium, B2B, hibah)
+- Ekspansi ke platform lain dan penguatan infrastruktur
+
+## Privasi dan Keamanan
+
+- Enkripsi data lokal dan server
+- Penyimpanan token secara aman
+- Mekanisme opt-in untuk semua akses sensor
+- Kebijakan privasi dan persetujuan pengguna ditampilkan dengan transparan
+
+## Instalasi untuk Pengembang
+
+```bash
+git clone https://github.com/yourusername/diary-depresiku.git
+cd diary-depresiku
+./gradlew installDebug
+
+## Kontribusi
+Kami menyambut kontribusi dari komunitas. Silakan fork repositori ini, buat branch baru, dan kirim pull request. Pedoman kontribusi tersedia di CONTRIBUTING.md.
+
+## Lisensi
+Proyek ini dirilis di bawah MIT License.
+
+## Kontak
+Pengembang utama:
+dr. Tan
+Email: tanerizawa(at)gmail.com
+GitHub: https://github.com/tanerizawa
