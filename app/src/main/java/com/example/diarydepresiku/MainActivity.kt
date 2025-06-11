@@ -22,8 +22,10 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Icon
 import androidx.compose.material.icons.filled.Insights
 import androidx.compose.material.icons.filled.Article
+import androidx.compose.material.icons.filled.Settings
 import com.example.diarydepresiku.ContentViewModel
 import com.example.diarydepresiku.ContentViewModelFactory
+import com.example.diarydepresiku.ui.ReminderSettingsScreen
 
 
 // Hapus definisi 'moodOptions' jika sudah ada di DiaryFormScreen.kt atau tempat lain yang lebih tepat.
@@ -101,6 +103,19 @@ class MainActivity : ComponentActivity() {
                                 alwaysShowLabel = true
                             )
 
+                            NavigationBarItem(
+                                selected = currentRoute == "settings",
+                                onClick = {
+                                    navController.navigate("settings") {
+                                        popUpTo(navController.graph.startDestinationId) { inclusive = false }
+                                        launchSingleTop = true
+                                    }
+                                },
+                                icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
+                                label = { Text("Settings") },
+                                alwaysShowLabel = true
+                            )
+
                         }
                     }
                 ) { innerPadding ->
@@ -123,6 +138,9 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("content") {
                             EducationalContentScreen(viewModel = contentViewModel)
+                        }
+                        composable("settings") {
+                            ReminderSettingsScreen(prefs = application.reminderPreferences)
                         }
                     }
                 }
