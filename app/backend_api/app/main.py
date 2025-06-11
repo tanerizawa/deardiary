@@ -3,7 +3,7 @@ from fastapi import FastAPI, Depends, HTTPException, status # Import status dan 
 from sqlalchemy.orm import Session
 from typing import List # Untuk tipe hint List
 
-from backend_api import crud # Tambahkan import crud
+from . import crud  # Import modul CRUD lokal
 from . import models, schemas
 from .database import engine, get_db
 
