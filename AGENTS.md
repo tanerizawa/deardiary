@@ -1,17 +1,3 @@
-# Development Guidelines
-
-## Build the Android app
-Run:
-```bash
-./gradlew assembleDebug
-```
-
-## Run Android unit tests
-Run:
-```bash
-./gradlew test
-```
-
 ## Start the FastAPI backend
 From the project root, run:
 ```bash
