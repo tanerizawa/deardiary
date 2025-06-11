@@ -9,7 +9,7 @@ import com.example.diarydepresiku.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class ContentRepository(
+open class ContentRepository(
     private val api: NewsApiService,
     private val dao: EducationalArticleDao,
     private val context: Context
@@ -21,7 +21,7 @@ class ContentRepository(
         return cap.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 
-    suspend fun getArticles(apiKey: String, country: String = "us"): List<EducationalArticle> =
+    open suspend fun getArticles(apiKey: String, country: String = "us"): List<EducationalArticle> =
         withContext(Dispatchers.IO) {
             if (isNetworkAvailable()) {
                 try {

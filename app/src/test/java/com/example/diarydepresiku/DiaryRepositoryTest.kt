@@ -1,0 +1,52 @@
+package com.example.diarydepresiku
+
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
+import org.junit.Assert.assertEquals
+import org.junit.Test
+import retrofit2.Response
+
+class FakeDiaryDao : DiaryDao {
+    val entries = mutableListOf<DiaryEntry>()
+    override suspend fun insertEntry(entry: DiaryEntry) { entries.add(entry) }
+    override suspend fun updateEntry(entry: DiaryEntry) {}
+    override suspend fun deleteEntry(entry: DiaryEntry) { entries.remove(entry) }
+    override suspend fun getEntryById(id: Int): DiaryEntry? = entries.find { it.id == id }
+    override fun getAllEntries(): Flow<List<DiaryEntry>> = flowOf(entries)
+}
+
+class FakeDiaryApi : DiaryApi {
+    var posted: DiaryEntryRequest? = null
+    override suspend fun postEntry(entry: DiaryEntryRequest): Response<DiaryEntryResponse> {
+        posted = entry
+        return Response.success(DiaryEntryResponse(1, entry.content, entry.mood, entry.timestamp))
+    }
+    override suspend fun getMoodStats(): Response<MoodStatsResponse> {
+        return Response.success(MoodStatsResponse(mapOf("Senang" to 1)))
+    }
+}
+
+class DiaryRepositoryTest {
+    @Test
+    fun addEntry_savesLocallyAndCallsApi() = runBlocking {
+        val dao = FakeDiaryDao()
+        val api = FakeDiaryApi()
+        val repository = DiaryRepository(dao, api)
+
+        repository.addEntry("Hello", "Senang")
+
+        assertEquals(1, dao.entries.size)
+        assertEquals("Hello", dao.entries[0].content)
+        assertEquals("Senang", api.posted?.mood)
+    }
+
+    @Test
+    fun getMoodStats_returnsApiData() = runBlocking {
+        val repository = DiaryRepository(FakeDiaryDao(), FakeDiaryApi())
+
+        val stats = repository.getMoodStats()
+
+        assertEquals(mapOf("Senang" to 1), stats)
+    }
+}
