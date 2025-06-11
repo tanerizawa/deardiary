@@ -1,1 +1,89 @@
+# == Android Studio Project Files ==
+.gradle/
+.idea/
+.idea/libraries/
+.idea/modules.xml
+.idea/workspace.xml
+.idea/misc.xml
+.idea/vcs.xml
+.idea/assetWizardSettings.xml
+.idea/runConfigurations/
+.idea/renderings.xml
+.idea/compiler.xml
+.idea/jarRepositories.xml
+.idea/codeStyles/
+
+# Specific .idea files that might sometimes be useful to track (uncomment if needed):
+# .idea/gradle.xml
+# .idea/navEditor.xml
+
+# == Build Artifacts ==
+/build/
+/app/build/
+/captures/
+/out/
+/data/
+*.apk
+*.aab
+*.aar
+*.ap_
+*.iml
+*.so
+
+# == Local Configuration ==
 local.properties
+debug.keystore
+*.keystore
+
+# == NDK Specific (if using C/C++ native code) ==
+.externalNativeBuild/
+.cxx/
+build/.cxx/
+build/intermediates/cmake/
+
+# == Android Studio Generated Files ==
+crashlytics-build.properties
+fabric.properties
+
+# == Common IDE and OS Files ==
+.DS_Store          # MacOS generated files
+Thumbs.db          # Windows generated files
+*.log
+*.bak
+*.swp
+*~
+.vscode/           # Visual Studio Code files (if you also use VS Code for parts of the project)
+
+# == Backend (Python/FastAPI) Specific Files ==
+# assuming your backend is located at `app/backend_api` or `app/backend`
+# You might need to adjust the path if your backend is in a different location.
+
+# Python virtual environment (if created inside the project)
+/backend/venv/              # If your backend is in `app/backend/venv`
+/backend_api/venv/          # If your backend is in `app/backend_api/venv`
+.venv/                      # Common virtual environment name
+
+# Python compiled files
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Database files (FastAPI/SQLAlchemy)
+*.db                      # e.g., diary.db (this will ignore any .db file in your project root, be careful if you have other dbs you want to track)
+!app/backend_api/app/diary.db  # Example: UNCOMMENT AND ADJUST if you want to track a specific database file
+# OR: If your FastAPI database file is always named `diary.db` and you want to track it only there:
+#!backend/app/diary.db # If your backend is `app/backend/` as per your latest structure
+#!backend_api/app/diary.db # If your backend is `app/backend_api/app/` as per recommended structure
+
+# Log files for Python
+*.log
+
+# Environment variables file
+.env
+
+# Jupyter Notebook files (if used)
+.ipynb_checkpoints/
+
+# Any specific backend artifacts you don't want to commit
+# /backend/dist/
+# /backend_api/dist/
