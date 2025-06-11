@@ -20,6 +20,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Icon
 import androidx.compose.material.icons.filled.Insights
+import com.example.diarydepresiku.ContentViewModel
+import com.example.diarydepresiku.ContentViewModelFactory
 
 
 // Hapus definisi 'moodOptions' jika sudah ada di DiaryFormScreen.kt atau tempat lain yang lebih tepat.
@@ -33,6 +35,15 @@ class MainActivity : ComponentActivity() {
             val application = LocalContext.current.applicationContext as MyApplication
             val factory = DiaryViewModelFactory(application = application)
             val diaryViewModel: DiaryViewModel = viewModel(factory = factory)
+
+            val contentFactory = ContentViewModelFactory(
+                repository = application.contentRepository,
+                diaryViewModel = diaryViewModel
+            )
+            val contentViewModel: ContentViewModel = viewModel(factory = contentFactory)
+            LaunchedEffect(Unit) {
+                contentViewModel.refreshArticles()
+            }
 
             DiarydepresikuTheme {
                 val navController = rememberNavController()
