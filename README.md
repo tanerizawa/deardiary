@@ -30,3 +30,4 @@ This repository contains an Android application and a small FastAPI backend used
    The API will be available at `http://localhost:8000`.
 
 The backend uses an SQLite database (`diary.db`) created automatically in the backend directory. There are no required environment variables.
+The source code lives in `app/backend_api/app`, which includes an `__init__.py` file so it can be imported as the `app` package.
