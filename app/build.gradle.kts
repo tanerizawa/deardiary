@@ -87,6 +87,8 @@ dependencies {
     // ---- Kotlin Coroutines Core ----
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.datastore.preferences)
 
     // ---- Dependensi pengujian ----
     testImplementation(libs.junit)

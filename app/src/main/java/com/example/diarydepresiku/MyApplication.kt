@@ -1,6 +1,10 @@
 package com.example.diarydepresiku
 
 import android.app.Application
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.os.Build
+import android.content.Context
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import com.example.diarydepresiku.content.NewsApiService
@@ -54,5 +58,26 @@ class MyApplication : Application() {
 
     val contentRepository: ContentRepository by lazy {
         ContentRepository(newsApi, articleDao, this)
+    }
+
+    val reminderPreferences: ReminderPreferences by lazy {
+        ReminderPreferences(this)
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        createNotificationChannel()
+    }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                ReminderWorker.CHANNEL_ID,
+                "Daily Reminder",
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+            val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            manager.createNotificationChannel(channel)
+        }
     }
 }
