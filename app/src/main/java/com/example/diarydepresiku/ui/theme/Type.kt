@@ -3,13 +3,26 @@ package com.example.diarydepresiku.ui.theme
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
-//import androidx.compose.ui.text.font.googleFont // <<< Import ini
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.googlefonts.GoogleFont
+import androidx.compose.ui.text.googlefonts.Font
+import com.example.diarydepresiku.R
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.ExperimentalTextApi // <<< Pastikan import ini ada!
 
 @OptIn(ExperimentalTextApi::class) // <<< Anotasi ini di AppFontFamily
-val AppFontFamily = FontFamily.Default // Atau FontFamily.SansSerif, dll.
+private val fontProvider = GoogleFont.Provider(
+    providerAuthority = "com.google.android.gms.fonts",
+    providerPackage = "com.google.android.gms",
+    certificates = R.array.com_google_android_gms_fonts_certs
+)
+
+val AppFontFamily = FontFamily(
+    Font(GoogleFont("Roboto"), fontProvider, FontWeight.Normal),
+    Font(GoogleFont("Roboto"), fontProvider, FontWeight.Medium),
+    Font(GoogleFont("Roboto"), fontProvider, FontWeight.SemiBold),
+    Font(GoogleFont("Roboto"), fontProvider, FontWeight.Bold)
+)
 
 
 @OptIn(ExperimentalTextApi::class) // <<< Anotasi ini juga di Typography
