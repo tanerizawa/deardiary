@@ -3,22 +3,6 @@ package com.example.diarydepresiku
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.ColumnInfo
-import androidx.room.TypeConverter
-import java.util.Date // Penting untuk TypeConverter
-
-// Kelas TypeConverter untuk mengkonversi Date ke Long (Unix timestamp) dan sebaliknya
-// Ini memungkinkan Room untuk menyimpan Date object sebagai Long di database
-class Converters {
-    @TypeConverter
-    fun fromTimestamp(value: Long?): Date? {
-        return value?.let { Date(it) }
-    }
-
-    @TypeConverter
-    fun dateToTimestamp(date: Date?): Long? {
-        return date?.time
-    }
-}
 
 // Entitas data untuk satu entri diary yang akan disimpan di Room Database
 @Entity(tableName = "diary_entries")
