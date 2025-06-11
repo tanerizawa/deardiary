@@ -14,6 +14,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.diarydepresiku.ui.theme.DiarydepresikuTheme
 import com.example.diarydepresiku.ui.DiaryFormScreen // <<< PENTING: Import ini dari package ui
+import com.example.diarydepresiku.ui.MoodAnalysisScreen
+import androidx.navigation.compose.*
 
 // Hapus definisi 'moodOptions' jika sudah ada di DiaryFormScreen.kt atau tempat lain yang lebih tepat.
 // val moodOptions = listOf("Senang", "Tersipu", "Sedih", "Cemas", "Marah")
@@ -28,12 +30,51 @@ class MainActivity : ComponentActivity() {
             val diaryViewModel: DiaryViewModel = viewModel(factory = factory)
 
             DiarydepresikuTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    // Memanggil DiaryFormScreen dari file terpisah
-                    DiaryFormScreen(
-                        viewModel = diaryViewModel,
+                val navController = rememberNavController()
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                val currentRoute = navBackStackEntry?.destination?.route
+
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    bottomBar = {
+                        NavigationBar {
+                            NavigationBarItem(
+                                selected = currentRoute == "form",
+                                onClick = {
+                                    navController.navigate("form") {
+                                        popUpTo("form") { inclusive = false }
+                                        launchSingleTop = true
+                                    }
+                                },
+                                label = { Text("Diary") },
+                                alwaysShowLabel = true
+                            )
+                            NavigationBarItem(
+                                selected = currentRoute == "analysis",
+                                onClick = {
+                                    navController.navigate("analysis") {
+                                        popUpTo("form") { inclusive = false }
+                                        launchSingleTop = true
+                                    }
+                                },
+                                label = { Text("Analysis") },
+                                alwaysShowLabel = true
+                            )
+                        }
+                    }
+                ) { innerPadding ->
+                    NavHost(
+                        navController = navController,
+                        startDestination = "form",
                         modifier = Modifier.padding(innerPadding)
-                    )
+                    ) {
+                        composable("form") {
+                            DiaryFormScreen(viewModel = diaryViewModel)
+                        }
+                        composable("analysis") {
+                            MoodAnalysisScreen(viewModel = diaryViewModel)
+                        }
+                    }
                 }
             }
         }
