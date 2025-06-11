@@ -1,7 +1,9 @@
 ## Start the FastAPI backend
 From the project root, run:
 ```bash
-cd app/backend_api && uvicorn app.main:app --reload
+cd app/backend_api
+pip install -r requirements.txt
+uvicorn app.main:app --reload
 ```
 
 ## General guidelines
