@@ -12,12 +12,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 // Skema warna pastel lembut (diambil dari Color.kt yang telah disesuaikan)
+// Color scheme using the refreshed palette defined in Color.kt
 private val LightColorScheme = lightColorScheme(
-    primary = Blue80,             // warna utama aplikasi
-    secondary = Green80,          // pendukung seperti tombol sekunder
-    background = Gray80,          // latar belakang aplikasi
-    surface = Color.White,        // permukaan elemen UI
-    error = RedSoft,              // warna untuk pesan error
+    primary = Blue80,             // soft blue
+    secondary = Green80,          // mint green
+    background = Gray80,          // light gray background
+    surface = Color.White,
+    error = RedSoft,
     onPrimary = TextOnPrimary,    // warna teks di atas primary
     onSecondary = TextOnPrimary,
     onBackground = Color.Black,
@@ -28,8 +29,8 @@ private val LightColorScheme = lightColorScheme(
 private val DarkColorScheme = darkColorScheme(
     primary = Blue40,
     secondary = Green40,
-    background = Color(0xFF121212),
-    surface = Color(0xFF1E1E1E),
+    background = Gray40,
+    surface = Gray40,
     error = RedSoft,
     onPrimary = Color.White,
     onSecondary = Color.White,

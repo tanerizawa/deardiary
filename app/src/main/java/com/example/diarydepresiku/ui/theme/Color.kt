@@ -3,14 +3,14 @@ package com.example.diarydepresiku.ui.theme
 import androidx.compose.ui.graphics.Color
 
 // Warna utama lembut (Primary)
-val Blue80 = Color(0xFFB3E5FC)     // Biru langit muda
-val Green80 = Color(0xFFA5D6A7)    // Hijau pastel lembut
-val Gray80 = Color(0xFFE0E0E0)     // Abu terang lembut
+val Blue80 = Color(0xFF85C1E9)     // Soft blue
+val Green80 = Color(0xFFA3E4D7)    // Mint green
+val Gray80 = Color(0xFFF2F3F4)     // Light gray
 
 // Warna pendukung (Secondary dan Surface)
-val Blue40 = Color(0xFF4FC3F7)     // Biru sedang
-val Green40 = Color(0xFF81C784)    // Hijau sedang
-val Gray40 = Color(0xFFBDBDBD)     // Abu netral
+val Blue40 = Color(0xFF3498DB)     // Deeper blue
+val Green40 = Color(0xFF73C6B6)    // Deeper mint
+val Gray40 = Color(0xFFD5D8DC)     // Medium gray
 
 // Warna Aksen / Error
 val RedSoft = Color(0xFFEF9A9A)    // Merah pastel
