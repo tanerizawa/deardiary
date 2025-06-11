@@ -2,6 +2,7 @@ package com.example.diarydepresiku.ui
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,7 +18,8 @@ import com.example.diarydepresiku.DiaryViewModel
 @Composable
 fun MoodAnalysisScreen(
     viewModel: DiaryViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onNavigateToContent: (() -> Unit)? = null
 ) {
     val moodCounts = viewModel.moodCounts.collectAsState().value
     val weeklyFreq = viewModel.weeklyMoodFrequency.collectAsState().value
@@ -37,6 +39,15 @@ fun MoodAnalysisScreen(
 
         Text("Monthly Mood Frequency", style = MaterialTheme.typography.titleMedium)
         BarChart(data = monthlyFreq, barColor = MaterialTheme.colorScheme.tertiary)
+
+        onNavigateToContent?.let {
+            Button(
+                onClick = it,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Lihat Artikel")
+            }
+        }
     }
 }
 

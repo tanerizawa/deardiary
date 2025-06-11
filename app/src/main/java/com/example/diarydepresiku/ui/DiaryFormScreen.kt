@@ -45,7 +45,8 @@ val moodOptions = listOf("Senang", "Tersipu", "Sedih", "Cemas", "Marah")
 @Composable
 fun DiaryFormScreen(
     viewModel: DiaryViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onNavigateToContent: (() -> Unit)? = null
 ) {
     var diaryText by remember { mutableStateOf("") }
     var selectedMood by remember { mutableStateOf(moodOptions[0]) }
@@ -117,6 +118,18 @@ fun DiaryFormScreen(
                 color = if (message.contains("gagal", ignoreCase = true)) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(top = 8.dp)
             )
+            if (!message.contains("gagal", ignoreCase = true)) {
+                onNavigateToContent?.let {
+                    Button(
+                        onClick = it,
+                        modifier = Modifier
+                            .padding(top = 8.dp)
+                            .fillMaxWidth()
+                    ) {
+                        Text("Lihat Artikel")
+                    }
+                }
+            }
         }
 
         Spacer(Modifier.height(16.dp))

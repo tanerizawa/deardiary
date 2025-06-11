@@ -15,11 +15,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.diarydepresiku.ui.theme.DiarydepresikuTheme
 import com.example.diarydepresiku.ui.DiaryFormScreen // <<< PENTING: Import ini dari package ui
 import com.example.diarydepresiku.ui.MoodAnalysisScreen
+import com.example.diarydepresiku.ui.EducationalContentScreen
 import androidx.navigation.compose.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Icon
 import androidx.compose.material.icons.filled.Insights
+import androidx.compose.material.icons.filled.Article
 import com.example.diarydepresiku.ContentViewModel
 import com.example.diarydepresiku.ContentViewModelFactory
 
@@ -80,6 +82,19 @@ class MainActivity : ComponentActivity() {
                                 alwaysShowLabel = true
                             )
 
+                            NavigationBarItem(
+                                selected = currentRoute == "content",
+                                onClick = {
+                                    navController.navigate("content") {
+                                        popUpTo(navController.graph.startDestinationId) { inclusive = false }
+                                        launchSingleTop = true
+                                    }
+                                },
+                                icon = { Icon(Icons.Default.Article, contentDescription = "Content") },
+                                label = { Text("Content") },
+                                alwaysShowLabel = true
+                            )
+
                         }
                     }
                 ) { innerPadding ->
@@ -89,10 +104,19 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.padding(innerPadding)
                     ) {
                         composable("form") {
-                            DiaryFormScreen(viewModel = diaryViewModel)
+                            DiaryFormScreen(
+                                viewModel = diaryViewModel,
+                                onNavigateToContent = { navController.navigate("content") }
+                            )
                         }
                         composable("analysis") {
-                            MoodAnalysisScreen(viewModel = diaryViewModel)
+                            MoodAnalysisScreen(
+                                viewModel = diaryViewModel,
+                                onNavigateToContent = { navController.navigate("content") }
+                            )
+                        }
+                        composable("content") {
+                            EducationalContentScreen(viewModel = contentViewModel)
                         }
                     }
                 }
