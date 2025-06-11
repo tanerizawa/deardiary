@@ -9,12 +9,12 @@ plugins {
 
 android {
     namespace = "com.example.diarydepresiku"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.diarydepresiku"
         minSdk = 24 // OK
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1 // OK
         versionName = "1.0" // OK
 

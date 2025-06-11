@@ -3,38 +3,51 @@ package com.example.diarydepresiku
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge // Digunakan untuk edge-to-edge
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.* // Menggunakan Material 3 components
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview // Untuk Preview
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.collectAsState
 import android.app.Application
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import androidx.compose.ui.platform.LocalContext // <<< PENTING: Import ini untuk LocalContext
 
+// PENTING: Impor file tema Anda dari package yang benar
+import com.example.diarydepresiku.ui.theme.DiarydepresikuTheme // <<< TAMBAHKAN BARIS INI
+
+import java.text.SimpleDateFormat // Sudah ada
+import java.util.Date // Sudah ada
+import java.util.Locale // Sudah ada
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge() // Aktifkan edge-to-edge
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContent {
-            // Membungkus seluruh UI dengan tema aplikasi
+            // Akses Application context DARI DALAM Composable
+            // LocalContext.current harus dipanggil dalam fungsi @Composable.
+            // Gunakan 'applicationContext' dari LocalContext dan cast ke 'MyApplication'.
+            val application = LocalContext.current.applicationContext as MyApplication
+
+            // Inisialisasi ViewModelFactory Anda, melewati instance 'application'
+            val factory = DiaryViewModelFactory(application = application)
+
+            // Mengambil instance ViewModel menggunakan factory.
+            // Panggilan viewModel() ini sekarang berada dalam konteks Composable yang benar.
+            val diaryViewModel: DiaryViewModel = viewModel(factory = factory)
+
+            // Membungkus seluruh UI dengan tema aplikasi Anda
             DiarydepresikuTheme {
-                // Mengambil instance ViewModel
-                val diaryViewModel: DiaryViewModel = viewModel()
-                // Memanggil fungsi composable utama untuk UI aplikasi
                 // Menggunakan Scaffold untuk struktur dasar Material Design
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     DiaryFormScreen(
                         viewModel = diaryViewModel,
-                        modifier = Modifier.padding(innerPadding) // Penting untuk padding Scaffold
+                        modifier = Modifier.padding(innerPadding)
                     )
                 }
             }
@@ -45,48 +58,42 @@ class MainActivity : ComponentActivity() {
 // Daftar pilihan mood yang tersedia
 val moodOptions = listOf("Senang", "Tersipu", "Sedih", "Cemas", "Marah")
 
-@OptIn(ExperimentalMaterial3Api::class) // Anotasi untuk OutlinedTextField (Material 3)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DiaryFormScreen(
     viewModel: DiaryViewModel,
-    modifier: Modifier = Modifier // Modifier ditambahkan sebagai parameter
+    modifier: Modifier = Modifier
 ) {
-    // State untuk input teks diary
-    var diaryText by remember { mutableStateOf("") } // Menggunakan `by` untuk sintaks yang lebih ringkas
-    // State untuk pilihan mood (default ke mood pertama)
-    var selectedMood by remember { mutableStateOf(moodOptions[0]) } // Menggunakan `by`
+    var diaryText by remember { mutableStateOf("") }
+    var selectedMood by remember { mutableStateOf(moodOptions[0]) }
 
-    // Observasi data dari ViewModel
     val diaryEntries by viewModel.diaryEntries.collectAsState()
     val statusMessage by viewModel.statusMessage.collectAsState()
     val dateFormat = remember { SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.getDefault()) }
 
-    // UI disusun secara vertikal (Column)
     Column(
         modifier = modifier
             .padding(16.dp)
-            .fillMaxWidth(), // Mengisi lebar penuh
+            .fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        // Input teks untuk isi diary (dari Material 3)
         OutlinedTextField(
             value = diaryText,
             onValueChange = { diaryText = it },
             label = { Text("Isi Diary") },
-            placeholder = { Text("Tuliskan apa yang Anda rasakan hari ini...") }, // Placeholder
+            placeholder = { Text("Tuliskan apa yang Anda rasakan hari ini...") },
             modifier = Modifier.fillMaxWidth(),
-            minLines = 5, // Minimum 5 baris
-            maxLines = 10 // Maksimum 10 baris
+            minLines = 5,
+            maxLines = 10
         )
 
-        // Pilihan mood menggunakan RadioButton (dari Material 3)
         Text(
             text = "Mood Anda hari ini:",
-            style = MaterialTheme.typography.titleMedium, // Style yang lebih sesuai
+            style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(top = 8.dp)
         )
-        // Menampilkan setiap mood sebagai opsi yang bisa dipilih
-        FlowRow( // Menggunakan FlowRow untuk layout yang lebih fleksibel
+        // Menggunakan FlowRow untuk layout yang lebih fleksibel
+        FlowRow(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -94,37 +101,33 @@ fun DiaryFormScreen(
             moodOptions.forEach { mood ->
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.clickable { selectedMood = mood } // Clickable di Row untuk area klik lebih besar
+                    modifier = Modifier.clickable { selectedMood = mood }
                 ) {
                     RadioButton(
                         selected = (mood == selectedMood),
                         onClick = { selectedMood = mood }
                     )
-                    // Label teks untuk RadioButton
                     Text(text = mood)
                 }
             }
         }
 
+        Spacer(Modifier.height(16.dp))
 
-        Spacer(Modifier.height(16.dp)) // Spasi tambahan sebelum tombol
-
-        // Tombol Simpan untuk menyimpan entri diary (dari Material 3)
         Button(
             onClick = {
-                if (diaryText.isNotBlank()) { // Validasi sederhana agar tidak menyimpan teks kosong
+                if (diaryText.isNotBlank()) {
                     viewModel.saveEntry(diaryText, selectedMood)
-                    // Membersihkan input setelah menyimpan
                     diaryText = ""
-                    selectedMood = moodOptions[0] // Reset mood ke default
+                    selectedMood = moodOptions[0]
                 }
             },
             modifier = Modifier.fillMaxWidth(),
-            enabled = diaryText.isNotBlank() // Tombol aktif hanya jika ada teks
+            enabled = diaryText.isNotBlank()
         ) {
             Text(text = "Simpan Entri")
         }
-        // Tampilkan pesan status dari ViewModel jika ada
+
         statusMessage?.let { message ->
             Text(
                 text = message,
@@ -133,7 +136,6 @@ fun DiaryFormScreen(
             )
         }
 
-        // Contoh menampilkan daftar entri terbaru
         Spacer(Modifier.height(16.dp))
         Text(text = "Entri Terbaru:", style = MaterialTheme.typography.titleSmall)
         if (diaryEntries.isEmpty()) {
@@ -153,7 +155,16 @@ fun DiaryFormScreen(
 @Preview(showBackground = true, widthDp = 320)
 @Composable
 fun DiaryFormScreenPreview() {
+    // Untuk preview, ViewModel harus diinisialisasi dengan Application context
+    // Anda bisa membuat instance dummy dari MyApplication jika tidak ada.
+    // Atau lebih baik, buat ViewModelFactory yang bisa menerima Context biasa untuk Preview,
+    // atau gunakan teknik lain seperti hilt-android-testing untuk preview.
+    // Namun, cara termudah adalah menggunakan LocalContext.current.applicationContext
+    // dan mengasumsikan itu adalah instance MyApplication.
+    val application = LocalContext.current.applicationContext as MyApplication
+    val factory = DiaryViewModelFactory(application = application)
+
     DiarydepresikuTheme {
-        DiaryFormScreen(viewModel = DiaryViewModel(Application()))
+        DiaryFormScreen(viewModel = viewModel(factory = factory))
     }
 }
