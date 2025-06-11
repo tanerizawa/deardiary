@@ -95,12 +95,10 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:$okhttp_version") // OkHttp (HTTP client)
     implementation("com.squareup.okhttp3:logging-interceptor:$okhttp_version") // Interceptor untuk logging (membantu debugging)
 
-    // ---- Kotlin Coroutines Core (jika belum ada) ----
-    // Pastikan Anda sudah punya implementasi coroutines-core dan coroutines-android.
-    // Biasanya sudah datang dengan room-ktx atau lifecycle-viewmodel-ktx,
-    // tapi tidak ada salahnya memastikan.
-    // implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0") // Ganti dengan versi terbaru
-    // implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0") // Ganti dengan versi terbaru
+    // ---- Kotlin Coroutines Core ----
+    // Menambahkan dependensi eksplisit untuk coroutines
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
 
 
     // ---- Dependensi pengujian (sudah ada, hanya peninjauan) ----
