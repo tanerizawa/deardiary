@@ -1,10 +1,18 @@
 package com.example.diarydepresiku.ui
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.diarydepresiku.DiaryViewModel
@@ -15,8 +23,8 @@ import java.util.Locale
 
 @Composable
 fun DiaryFormScreen(viewModel: DiaryViewModel, modifier: Modifier = Modifier) {
-    val diaryText by remember { mutableStateOf("") }
-    val selectedMood by remember { mutableStateOf(moodOptions[0]) }
+    var diaryText by remember { mutableStateOf("") }
+    var selectedMood by remember { mutableStateOf(moodOptions[0]) }
 
     // Mengamati daftar entri dari ViewModel
     val diaryEntries by viewModel.diaryEntries.collectAsState()
