@@ -2,7 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    id("com.google.devtools.ksp") version "1.9.0-1.0.13" // TAMBAHKAN INI (Versi KSP harus cocok dengan versi Kotlin Anda)
+    // KSP versi harus sesuai dengan versi Kotlin yang digunakan
+    id("com.google.devtools.ksp") version "2.0.21-1.0.28"
     // Ganti dengan versi terbaru KSP yang sesuai dengan Kotlin Anda
 }
 
