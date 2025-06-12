@@ -160,6 +160,10 @@ GEMINI_API_KEY=your-gemini-api-key
 
 File `local.properties` sudah ada di `.gitignore`, sehingga kunci rahasia tidak
 terikut saat commit.
+
+## Deployment di Render
+
+Blueprint `render.yaml` tidak menyertakan nilai `GEMINI_API_KEY`. Saat menyiapkan layanan di Render, buka menu **Environment** dan tambahkan variabel ini dengan kunci Gemini Anda. Setelah disimpan, deploy blueprint seperti biasa.
 ## Kontribusi
 Kami menyambut kontribusi dari komunitas. Silakan fork repositori ini, buat branch baru, dan kirim pull request. Pedoman kontribusi tersedia di CONTRIBUTING.md.
 
