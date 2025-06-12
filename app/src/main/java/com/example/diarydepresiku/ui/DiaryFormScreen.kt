@@ -1,26 +1,21 @@
 package com.example.diarydepresiku.ui // Pastikan package ini sesuai dengan struktur folder Anda
 
 import android.app.Application // Diperlukan untuk Preview ViewModel
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi // <<< PENTING: Untuk FlowRow
+import androidx.compose.foundation.layout.FlowRow // <<< PENTING: Untuk FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api // <<< PENTING: Untuk Material3 API tertentu (jika ada)
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.FitnessCenter
-import androidx.compose.material.icons.outlined.Group
-import androidx.compose.material.icons.outlined.Work
-import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -33,34 +28,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext // Diperlukan untuk Preview ViewModel
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.graphics.Color
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.diarydepresiku.DiaryViewModel
 import com.example.diarydepresiku.DiaryViewModelFactory // Pastikan ini diimpor
 import com.example.diarydepresiku.MyApplication // Pastikan ini diimpor
 import com.example.diarydepresiku.ui.theme.DiarydepresikuTheme // Pastikan ini diimpor
-import com.example.diarydepresiku.ui.theme.Blue80
-import com.example.diarydepresiku.ui.theme.RedSoft
-import com.example.diarydepresiku.ui.theme.YellowSoft
 
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-data class MoodItem(val emoji: String, val label: String, val color: Color)
+// Daftar pilihan mood yang tersedia - Pindahkan di sini atau di file tersendiri
+val moodOptions = listOf("Senang", "Tersipu", "Sedih", "Cemas", "Marah")
 
-val moodOptions = listOf(
-    MoodItem("\uD83D\uDE0A", "Positif", YellowSoft),
-    MoodItem("\uD83D\uDE1F", "Cemas", Blue80),
-    MoodItem("\uD83D\uDE22", "Sedih", RedSoft),
-    MoodItem("\uD83D\uDE21", "Marah", RedSoft)
-)
-
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class) // <<< Anotasi @OptIn untuk FlowRow
 @Composable
 fun DiaryFormScreen(
     viewModel: DiaryViewModel,
@@ -68,7 +49,7 @@ fun DiaryFormScreen(
     onNavigateToContent: (() -> Unit)? = null
 ) {
     var diaryText by remember { mutableStateOf("") }
-    var selectedMood by remember { mutableStateOf(moodOptions[0].label) }
+    var selectedMood by remember { mutableStateOf(moodOptions[0]) }
 
     val diaryEntries by viewModel.diaryEntries.collectAsState()
     val statusMessage by viewModel.statusMessage.collectAsState()
@@ -76,7 +57,6 @@ fun DiaryFormScreen(
 
     Column(
         modifier = modifier
-            .background(Blue80)
             .padding(16.dp)
             .fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -96,50 +76,24 @@ fun DiaryFormScreen(
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(top = 8.dp)
         )
-        Row(
+        // Menggunakan FlowRow untuk layout yang lebih fleksibel
+        FlowRow(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            moodOptions.forEach { item ->
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .size(56.dp)
-                        .background(item.color, CircleShape)
-                        .clickable { selectedMood = item.label }
-                        .padding(8.dp)
+            moodOptions.forEach { mood ->
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable { selectedMood = mood }
                 ) {
-                    Text(
-                        text = item.emoji,
-                        fontSize = 24.sp,
-                        modifier = Modifier.semantics { contentDescription = item.label }
+                    RadioButton(
+                        selected = (mood == selectedMood),
+                        onClick = { selectedMood = mood }
                     )
+                    Text(text = mood)
                 }
             }
-        }
-        Spacer(Modifier.height(16.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Outlined.Work,
-                contentDescription = "Kerja",
-                tint = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.size(32.dp)
-            )
-            Icon(
-                imageVector = Icons.Outlined.FitnessCenter,
-                contentDescription = "Olahraga",
-                tint = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.size(32.dp)
-            )
-            Icon(
-                imageVector = Icons.Outlined.Group,
-                contentDescription = "Sosialisasi",
-                tint = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.size(32.dp)
-            )
         }
 
         Spacer(Modifier.height(16.dp))
@@ -149,7 +103,7 @@ fun DiaryFormScreen(
                 if (diaryText.isNotBlank()) {
                     viewModel.saveEntry(diaryText, selectedMood)
                     diaryText = ""
-                    selectedMood = moodOptions[0].label
+                    selectedMood = moodOptions[0]
                 }
             },
             modifier = Modifier.fillMaxWidth(),

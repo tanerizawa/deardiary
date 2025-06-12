@@ -16,14 +16,18 @@ import androidx.navigation.compose.*
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Insights
+import androidx.compose.material.icons.filled.Article
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.automirrored.filled.Article // ✅ Gunakan versi AutoMirrored
 
 import com.example.diarydepresiku.ui.theme.DiarydepresikuTheme
 import com.example.diarydepresiku.ui.DiaryFormScreen
-import com.example.diarydepresiku.ui.HistoryScreen
-import com.example.diarydepresiku.ui.ProfileScreen
+import com.example.diarydepresiku.ui.MoodAnalysisScreen
+import com.example.diarydepresiku.ui.EducationalContentScreen
+import com.example.diarydepresiku.ContentViewModel
+import com.example.diarydepresiku.ContentViewModelFactory
+import com.example.diarydepresiku.ui.ReminderSettingsScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,6 +38,24 @@ class MainActivity : ComponentActivity() {
             val diaryFactory = DiaryViewModelFactory(application = application)
             val diaryViewModel: DiaryViewModel = viewModel(factory = diaryFactory)
 
+            val contentFactory = ContentViewModelFactory(
+                repository = application.contentRepository,
+                diaryViewModel = diaryViewModel
+            )
+            val contentViewModel: ContentViewModel = viewModel(factory = contentFactory)
+
+            // Refresh konten artikel saat pertama kali dibuka
+            LaunchedEffect(Unit) {
+                contentViewModel.refreshArticles()
+            }
+
+            // Update artikel berdasarkan statistik mood
+            LaunchedEffect(Unit) {
+                diaryViewModel.moodCounts.collect { stats ->
+                    contentViewModel.updateMoodStats(stats)
+                    contentViewModel.refreshArticles()
+                }
+            }
 
             DiarydepresikuTheme {
                 val navController = rememberNavController()
@@ -45,7 +67,7 @@ class MainActivity : ComponentActivity() {
                     floatingActionButton = {
                         FloatingActionButton(
                             onClick = {
-                                navController.navigate("home") {
+                                navController.navigate("form") {
                                     popUpTo(navController.graph.startDestinationId) { inclusive = false }
                                     launchSingleTop = true
                                 }
@@ -58,60 +80,80 @@ class MainActivity : ComponentActivity() {
                     bottomBar = {
                         NavigationBar {
                             NavigationBarItem(
-                                selected = currentRoute == "home",
+                                selected = currentRoute == "form",
                                 onClick = {
-                                    navController.navigate("home") {
+                                    navController.navigate("form") {
                                         popUpTo(navController.graph.startDestinationId) { inclusive = false }
                                         launchSingleTop = true
                                     }
                                 },
-                                icon = { Icon(Icons.Filled.Home, contentDescription = "Beranda") },
-                                label = { Text("Beranda") },
+                                icon = { Icon(Icons.Filled.Edit, contentDescription = "Diary") },
+                                label = { Text("Diary") },
                                 alwaysShowLabel = true
                             )
                             NavigationBarItem(
-                                selected = currentRoute == "history",
+                                selected = currentRoute == "analysis",
                                 onClick = {
-                                    navController.navigate("history") {
+                                    navController.navigate("analysis") {
                                         popUpTo(navController.graph.startDestinationId) { inclusive = false }
                                         launchSingleTop = true
                                     }
                                 },
-                                icon = { Icon(Icons.Filled.CalendarToday, contentDescription = "Riwayat") },
-                                label = { Text("Riwayat") },
+                                icon = { Icon(Icons.Filled.Insights, contentDescription = "Analysis") },
+                                label = { Text("Analysis") },
                                 alwaysShowLabel = true
                             )
                             NavigationBarItem(
-                                selected = currentRoute == "profile",
+                                selected = currentRoute == "content",
                                 onClick = {
-                                    navController.navigate("profile") {
+                                    navController.navigate("content") {
                                         popUpTo(navController.graph.startDestinationId) { inclusive = false }
                                         launchSingleTop = true
                                     }
                                 },
-                                icon = { Icon(Icons.Filled.Person, contentDescription = "Profil") },
-                                label = { Text("Profil") },
+                                icon = { Icon(Icons.AutoMirrored.Filled.Article, contentDescription = "Content") },
+                                label = { Text("Content") },
                                 alwaysShowLabel = true
                             )
+
+                            NavigationBarItem(
+                                selected = currentRoute == "settings",
+                                onClick = {
+                                    navController.navigate("settings") {
+                                        popUpTo(navController.graph.startDestinationId) { inclusive = false }
+                                        launchSingleTop = true
+                                    }
+                                },
+                                icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
+                                label = { Text("Settings") },
+                                alwaysShowLabel = true
+                            )
+
                         }
                     }
                 ) { innerPadding ->
                     NavHost(
                         navController = navController,
-                        startDestination = "home",
+                        startDestination = "form",
                         modifier = Modifier.padding(innerPadding)
                     ) {
-                        composable("home") {
+                        composable("form") {
                             DiaryFormScreen(
                                 viewModel = diaryViewModel,
-                                onNavigateToContent = null
+                                onNavigateToContent = { navController.navigate("content") }
                             )
                         }
-                        composable("history") {
-                            HistoryScreen(viewModel = diaryViewModel)
+                        composable("analysis") {
+                            MoodAnalysisScreen(
+                                viewModel = diaryViewModel,
+                                onNavigateToContent = { navController.navigate("content") }
+                            )
                         }
-                        composable("profile") {
-                            ProfileScreen()
+                        composable("content") {
+                            EducationalContentScreen(viewModel = contentViewModel)
+                        }
+                        composable("settings") {
+                            ReminderSettingsScreen(prefs = application.reminderPreferences)
                         }
                     }
                 }
