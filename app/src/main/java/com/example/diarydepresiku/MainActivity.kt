@@ -16,15 +16,17 @@ import androidx.navigation.compose.*
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Insights
-import androidx.compose.material.icons.filled.Article
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.automirrored.filled.Article // ✅ Gunakan versi AutoMirrored
 
 import com.example.diarydepresiku.ui.theme.DiarydepresikuTheme
 import com.example.diarydepresiku.ui.DiaryFormScreen
 import com.example.diarydepresiku.ui.MoodAnalysisScreen
 import com.example.diarydepresiku.ui.EducationalContentScreen
+import com.example.diarydepresiku.ui.HistoryScreen
+import com.example.diarydepresiku.ui.ProfileScreen
 import com.example.diarydepresiku.ContentViewModel
 import com.example.diarydepresiku.ContentViewModelFactory
 import com.example.diarydepresiku.ui.ReminderSettingsScreen
@@ -80,42 +82,41 @@ class MainActivity : ComponentActivity() {
                     bottomBar = {
                         NavigationBar {
                             NavigationBarItem(
-                                selected = currentRoute == "form",
+                                selected = currentRoute == "home",
                                 onClick = {
-                                    navController.navigate("form") {
+                                    navController.navigate("home") {
                                         popUpTo(navController.graph.startDestinationId) { inclusive = false }
                                         launchSingleTop = true
                                     }
                                 },
-                                icon = { Icon(Icons.Filled.Edit, contentDescription = "Diary") },
-                                label = { Text("Diary") },
+                                icon = { Icon(Icons.Filled.Home, contentDescription = "Home") },
+                                label = { Text("Home") },
                                 alwaysShowLabel = true
                             )
                             NavigationBarItem(
-                                selected = currentRoute == "analysis",
+                                selected = currentRoute == "history",
                                 onClick = {
-                                    navController.navigate("analysis") {
+                                    navController.navigate("history") {
                                         popUpTo(navController.graph.startDestinationId) { inclusive = false }
                                         launchSingleTop = true
                                     }
                                 },
-                                icon = { Icon(Icons.Filled.Insights, contentDescription = "Analysis") },
-                                label = { Text("Analysis") },
+                                icon = { Icon(Icons.Filled.History, contentDescription = "History") },
+                                label = { Text("History") },
                                 alwaysShowLabel = true
                             )
                             NavigationBarItem(
-                                selected = currentRoute == "content",
+                                selected = currentRoute == "profile",
                                 onClick = {
-                                    navController.navigate("content") {
+                                    navController.navigate("profile") {
                                         popUpTo(navController.graph.startDestinationId) { inclusive = false }
                                         launchSingleTop = true
                                     }
                                 },
-                                icon = { Icon(Icons.AutoMirrored.Filled.Article, contentDescription = "Content") },
-                                label = { Text("Content") },
+                                icon = { Icon(Icons.Filled.Person, contentDescription = "Profile") },
+                                label = { Text("Profile") },
                                 alwaysShowLabel = true
                             )
-
                             NavigationBarItem(
                                 selected = currentRoute == "settings",
                                 onClick = {
@@ -134,7 +135,7 @@ class MainActivity : ComponentActivity() {
                 ) { innerPadding ->
                     NavHost(
                         navController = navController,
-                        startDestination = "form",
+                        startDestination = "home",
                         modifier = Modifier.padding(innerPadding)
                     ) {
                         composable("form") {
@@ -143,11 +144,17 @@ class MainActivity : ComponentActivity() {
                                 onNavigateToContent = { navController.navigate("content") }
                             )
                         }
-                        composable("analysis") {
+                        composable("home") {
                             MoodAnalysisScreen(
                                 viewModel = diaryViewModel,
                                 onNavigateToContent = { navController.navigate("content") }
                             )
+                        }
+                        composable("history") {
+                            HistoryScreen(viewModel = diaryViewModel)
+                        }
+                        composable("profile") {
+                            ProfileScreen()
                         }
                         composable("content") {
                             EducationalContentScreen(viewModel = contentViewModel)
