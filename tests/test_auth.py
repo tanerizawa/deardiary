@@ -37,7 +37,9 @@ def client():
 
 
 def test_register_and_login(client):
-    resp = client.post("/register/", json={"email": "a@a.com", "password": "x"})
+    resp = client.post(
+        "/register/", json={"email": "a@a.com", "password": "x", "name": "Alice"}
+    )
     assert resp.status_code == 201
 
     resp = client.post("/login/", json={"email": "a@a.com", "password": "x"})
@@ -46,6 +48,6 @@ def test_register_and_login(client):
 
 
 def test_login_fail(client):
-    client.post("/register/", json={"email": "b@a.com", "password": "x"})
+    client.post("/register/", json={"email": "b@a.com", "password": "x", "name": "Bob"})
     resp = client.post("/login/", json={"email": "b@a.com", "password": "bad"})
     assert resp.status_code == 400

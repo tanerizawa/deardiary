@@ -37,7 +37,8 @@ data class MoodStatsResponse(
 
 data class AuthRequest(
     @SerializedName("email") val email: String,
-    @SerializedName("password") val password: String
+    @SerializedName("password") val password: String,
+    @SerializedName("name") val name: String? = null
 )
 
 data class TokenResponse(

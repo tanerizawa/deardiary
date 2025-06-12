@@ -33,7 +33,7 @@ async def register_user(user: schemas.UserCreate, db: Session = Depends(get_db))
 
 
 @app.post("/login/", response_model=schemas.Token)
-async def login_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+async def login_user(user: schemas.UserLogin, db: Session = Depends(get_db)):
     if not crud.authenticate_user(db, user.email, user.password):
         raise HTTPException(status_code=400, detail="Invalid credentials")
     return {"token": "dummy"}
