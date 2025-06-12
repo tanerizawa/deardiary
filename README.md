@@ -6,25 +6,25 @@
 
 ### Minimum Viable Product (MVP)
 
-- **Pencatatan Emosi Harian**
+- **Pencatatan Emosi Harian**  
   Pengguna dapat menulis catatan bebas serta memilih mood melalui skala atau emotikon. Formulir opsional seperti aktivitas harian dan tingkat stres juga tersedia.
 
-- **Pelacakan Aktivitas dan Lokasi**
+- **Pelacakan Aktivitas dan Lokasi**  
   Aktivitas fisik dan lokasi pengguna tercatat secara otomatis (dengan izin), memberi konteks pada kondisi emosional harian.
 
-- **Integrasi Data Kesehatan**
+- **Integrasi Data Kesehatan**  
   Dukungan terhadap Google Fit memungkinkan pengambilan data langkah, detak jantung, dan aktivitas lainnya secara aman.
 
-- **Analisis Emosi Berbasis AI**
+- **Analisis Emosi Berbasis AI**  
   Catatan pengguna dianalisis menggunakan model NLP untuk mengidentifikasi pola emosi dan menyarankan konten yang sesuai.
 
-- **Rekomendasi Konten Personal**
+- **Rekomendasi Konten Personal**  
   Berdasarkan hasil analisis, sistem menyarankan artikel, latihan relaksasi, atau tips kesehatan mental secara relevan.
 
-- **Sinkronisasi dan Mode Offline**
+- **Sinkronisasi dan Mode Offline**  
   Data dicatat secara lokal dan disinkronkan otomatis ke server saat koneksi tersedia.
 
-- **Antarmuka Minimalis**
+- **Antarmuka Minimalis**  
   UI dirancang sederhana, bersih, dan menenangkan, menggunakan palet warna pastel dan struktur navigasi intuitif.
 
 ## Rencana Pengembangan Lanjutan
@@ -39,7 +39,6 @@
 ## Arsitektur dan Teknologi
 
 ### Client-Side (Android)
-
 - **Bahasa**: Kotlin
 - **Framework**: Jetpack Compose (menggunakan Google Fonts untuk tipografi)
 - **Penyimpanan Lokal**: Room (SQLite)
@@ -48,7 +47,6 @@
 - **Analisis AI Lokal (opsional)**: TensorFlow Lite
 
 ### Server-Side (Backend)
-
 - **Bahasa**: Python (FastAPI)
 - **Database**: PostgreSQL / MongoDB
 - **AI Processing**: OpenAI GPT API
@@ -82,14 +80,12 @@
 ## Roadmap Pengembangan
 
 ### Tahun Pertama
-
 - Q1: Riset dan desain UI/UX
 - Q2: Implementasi fitur inti dan backend
 - Q3: Pengujian beta, penyempurnaan, dan validasi AI
 - Q4: Peluncuran terbatas (closed/open beta)
 
 ### Tahun Kedua
-
 - Pengembangan fitur lanjutan
 - Pembentukan tim pengembang dan psikolog
 - Strategi komersialisasi (freemium, B2B, hibah)
@@ -104,17 +100,6 @@
 
 ## Instalasi untuk Pengembang
 
-### Quick Start (Recommended)
-
-```bash
-git clone https://github.com/yourusername/diary-depresiku.git
-cd diary-depresiku
-npm install    # Setup development environment
-npm run dev    # Start development server
-```
-
-### Manual Python Setup
-
 ```bash
 git clone https://github.com/yourusername/diary-depresiku.git
 cd diary-depresiku
@@ -123,8 +108,6 @@ cd app/backend_api
 pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
-
-📋 **Lihat [DEVELOPMENT.md](DEVELOPMENT.md) untuk panduan lengkap pengembangan.**
 
 ## Konfigurasi Build
 
@@ -152,17 +135,13 @@ buildTypes {
 
 Gunakan `BuildConfig.BASE_URL` di kode Kotlin untuk memperoleh URL yang sesuai
 dengan jenis build.
-
 ## Kontribusi
-
 Kami menyambut kontribusi dari komunitas. Silakan fork repositori ini, buat branch baru, dan kirim pull request. Pedoman kontribusi tersedia di CONTRIBUTING.md.
 
 ## Lisensi
-
 Proyek ini dirilis di bawah MIT License.
 
 ## Kontak
-
 Pengembang utama:
 dr. Tan
 Email: tanerizawa(at)gmail.com
