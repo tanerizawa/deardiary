@@ -5,6 +5,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 import pytest
+import requests
 
 sys.path.append("app/backend_api")
 
@@ -84,3 +85,36 @@ def test_analyze_entry(client, monkeypatch):
     resp = client.post("/analyze", json={"text": "saya senang"})
     assert resp.status_code == 200
     assert resp.json()["analysis"] == "Mood terdeteksi positif"
+
+
+def test_gemini_articles(client, monkeypatch):
+    class MockResp:
+        def raise_for_status(self):
+            pass
+
+        def json(self):
+            return {
+                "candidates": [
+                    {
+                        "content": {
+                            "parts": [{"text": '[{"title": "A", "summary": "B"}]'}]
+                        }
+                    }
+                ]
+            }
+
+    monkeypatch.setenv("GEMINI_API_KEY", "dummy")
+    monkeypatch.setattr("app.main.requests.post", lambda *a, **k: MockResp())
+    resp = client.post("/gemini_articles/", json={"text": "hi"})
+    assert resp.status_code == 200
+    assert resp.json() == [{"title": "A", "summary": "B"}]
+
+
+def test_gemini_articles_error(client, monkeypatch):
+    def raise_exc(*args, **kwargs):
+        raise requests.RequestException("bad")
+
+    monkeypatch.setenv("GEMINI_API_KEY", "dummy")
+    monkeypatch.setattr("app.main.requests.post", raise_exc)
+    resp = client.post("/gemini_articles/", json={"text": "hi"})
+    assert resp.status_code == 500

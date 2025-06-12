@@ -1,6 +1,7 @@
 # app/main.py: Aplikasi FastAPI dan endpoint-endpoint API
 from fastapi import FastAPI, Depends, HTTPException, status
 import os
+import json
 import requests
 from sqlalchemy.orm import Session
 from typing import List
@@ -32,9 +33,9 @@ def analyze_with_gemini(text: str) -> str:
                 "parts": [
                     {
                         "text": (
-                                "Analisis mood untuk teks berikut secara singkat. "
-                                "Balas hanya dengan kata Positif, Negatif, atau Netral.\n"
-                                + text
+                            "Analisis mood untuk teks berikut secara singkat. "
+                            "Balas hanya dengan kata Positif, Negatif, atau Netral.\n"
+                            + text
                         )
                     }
                 ]
@@ -55,6 +56,42 @@ def analyze_with_gemini(text: str) -> str:
         raise RuntimeError(f"Error from Gemini API: {e}")
 
 
+def generate_articles_with_gemini(text: str) -> List[schemas.GeminiArticleResponse]:
+    """Request Gemini API to create article titles and summaries."""
+
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        raise RuntimeError("Missing GEMINI_API_KEY")
+    url = (
+        "https://generativelanguage.googleapis.com/v1beta/models/"
+        f"gemini-pro:generateContent?key={api_key}"
+    )
+    payload = {
+        "contents": [
+            {
+                "parts": [
+                    {
+                        "text": (
+                            "Buat tiga judul artikel beserta ringkasan singkat dalam format JSON "
+                            "[{'title': 'Judul', 'summary': 'Ringkasan'}] berdasarkan teks berikut.\n"
+                            + text
+                        )
+                    }
+                ]
+            }
+        ]
+    }
+    try:
+        response = requests.post(url, json=payload, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        text_resp = data["candidates"][0]["content"]["parts"][0]["text"]
+        articles = json.loads(text_resp)
+        return [schemas.GeminiArticleResponse(**a) for a in articles]
+    except Exception as e:
+        raise RuntimeError(f"Error from Gemini API: {e}")
+
+
 @app.post("/register/", status_code=status.HTTP_201_CREATED)
 async def register_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     if crud.get_user_by_email(db, user.email):
@@ -70,8 +107,14 @@ async def login_user(user: schemas.UserLogin, db: Session = Depends(get_db)):
     return {"token": "dummy"}
 
 
-@app.post("/entries/", response_model=schemas.DiaryEntryResponse, status_code=status.HTTP_201_CREATED)
-async def create_diary_entry_endpoint(entry: schemas.DiaryEntryCreate, db: Session = Depends(get_db)):
+@app.post(
+    "/entries/",
+    response_model=schemas.DiaryEntryResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+async def create_diary_entry_endpoint(
+    entry: schemas.DiaryEntryCreate, db: Session = Depends(get_db)
+):
     try:
         db_entry = crud.create_diary_entry(db=db, entry=entry)
         return schemas.DiaryEntryResponse.model_validate(db_entry)
@@ -80,7 +123,9 @@ async def create_diary_entry_endpoint(entry: schemas.DiaryEntryCreate, db: Sessi
 
 
 @app.get("/entries/", response_model=List[schemas.DiaryEntryResponse])
-async def read_diary_entries_endpoint(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+async def read_diary_entries_endpoint(
+    skip: int = 0, limit: int = 100, db: Session = Depends(get_db)
+):
     entries = crud.get_diary_entries(db=db, skip=skip, limit=limit)
     return [schemas.DiaryEntryResponse.model_validate(e) for e in entries]
 
@@ -100,6 +145,19 @@ def analyze_entry_endpoint(request: schemas.AnalyzeRequest):
         return {"analysis": analysis_result}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to analyze text: {e}")
+
+
+@app.post(
+    "/gemini_articles/",
+    response_model=List[schemas.GeminiArticleResponse],
+)
+def generate_articles_endpoint(request: schemas.GeminiArticleRequest):
+    """Generate article ideas based on supplied text."""
+
+    try:
+        return generate_articles_with_gemini(request.text)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to generate articles: {e}")
 
 
 @app.get("/stats/", response_model=schemas.MoodStatsResponse)
