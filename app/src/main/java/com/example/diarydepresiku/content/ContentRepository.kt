@@ -21,11 +21,19 @@ open class ContentRepository(
         return cap.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 
-    open suspend fun getArticles(apiKey: String, country: String = "us"): List<EducationalArticle> =
+    open suspend fun getArticles(
+        apiKey: String,
+        country: String = "us",
+        query: String? = null
+    ): List<EducationalArticle> =
         withContext(Dispatchers.IO) {
             if (isNetworkAvailable()) {
                 try {
-                    val response = api.getTopHeadlines(apiKey, country)
+                    val response = if (!query.isNullOrBlank()) {
+                        api.searchArticles(apiKey, query)
+                    } else {
+                        api.getTopHeadlines(apiKey, country)
+                    }
                     if (response.isSuccessful) {
                         val articles = response.body()?.articles ?: emptyList()
                         dao.clearAll()

@@ -20,6 +20,8 @@ android {
 
         // Base URL for backend API
         buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8000/\"")
+        // API key for fetching articles from NewsAPI
+        buildConfigField("String", "NEWS_API_KEY", "\"211a92aa3ca141c1b1c3a410235d80d7\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

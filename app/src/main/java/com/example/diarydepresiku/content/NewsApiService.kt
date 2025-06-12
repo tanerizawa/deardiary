@@ -12,4 +12,15 @@ interface NewsApiService {
         @Query("country") country: String = "us",
         @Query("category") category: String = "health"
     ): Response<NewsResponse>
+
+    /**
+     * Search articles using the NewsAPI `everything` endpoint.
+     * The [query] term is used to find relevant articles.
+     */
+    @GET("v2/everything")
+    suspend fun searchArticles(
+        @Query("apiKey") apiKey: String,
+        @Query("q") query: String,
+        @Query("sortBy") sortBy: String = "popularity"
+    ): Response<NewsResponse>
 }
