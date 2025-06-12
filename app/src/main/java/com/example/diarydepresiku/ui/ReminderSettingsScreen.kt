@@ -24,6 +24,8 @@ fun ReminderSettingsScreen(
     val coroutineScope = rememberCoroutineScope()
     val enabled by prefs.reminderEnabled.collectAsState(initial = false)
     val time by prefs.reminderTime.collectAsState(initial = LocalTime.of(8, 0))
+    val darkMode by prefs.darkMode.collectAsState(initial = false)
+    val fontScale by prefs.fontScale.collectAsState(initial = 1f)
     var showPicker by remember { mutableStateOf(false) }
 
     if (showPicker) {
@@ -60,6 +62,33 @@ fun ReminderSettingsScreen(
         Button(onClick = { showPicker = true }, enabled = enabled) {
             val formatted = time.format(DateTimeFormatter.ofPattern("HH:mm"))
             Text("Reminder Time: $formatted")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = "Dark Mode",
+                modifier = Modifier.weight(1f)
+            )
+            Switch(checked = darkMode, onCheckedChange = { value ->
+                coroutineScope.launch { prefs.setDarkMode(value) }
+            })
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+        Text("Font Size", style = MaterialTheme.typography.titleMedium)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            RadioButton(
+                selected = fontScale == 1f,
+                onClick = { coroutineScope.launch { prefs.setFontScale(1f) } }
+            )
+            Text("Normal", modifier = Modifier.padding(end = 16.dp))
+
+            RadioButton(
+                selected = fontScale > 1f,
+                onClick = { coroutineScope.launch { prefs.setFontScale(1.3f) } }
+            )
+            Text("Large")
         }
     }
 }

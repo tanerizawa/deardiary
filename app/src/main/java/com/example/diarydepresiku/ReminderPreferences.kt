@@ -1,7 +1,6 @@
 package com.example.diarydepresiku
 
 import android.content.Context
-import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -25,6 +24,12 @@ class ReminderPreferences(private val context: Context) {
             it[KEY_TIME]?.let { t -> LocalTime.parse(t, formatter) } ?: LocalTime.of(8, 0)
         }
 
+    val darkMode: Flow<Boolean> =
+        context.dataStore.data.map { it[KEY_DARK_MODE] ?: false }
+
+    val fontScale: Flow<Float> =
+        context.dataStore.data.map { it[KEY_FONT_SCALE]?.toFloat() ?: 1f }
+
     suspend fun setReminderEnabled(enabled: Boolean) {
         context.dataStore.edit { it[KEY_ENABLED] = enabled }
     }
@@ -33,8 +38,18 @@ class ReminderPreferences(private val context: Context) {
         context.dataStore.edit { it[KEY_TIME] = time.format(formatter) }
     }
 
+    suspend fun setDarkMode(enabled: Boolean) {
+        context.dataStore.edit { it[KEY_DARK_MODE] = enabled }
+    }
+
+    suspend fun setFontScale(scale: Float) {
+        context.dataStore.edit { it[KEY_FONT_SCALE] = scale.toString() }
+    }
+
     companion object {
         private val KEY_ENABLED = booleanPreferencesKey("reminder_enabled")
         private val KEY_TIME = stringPreferencesKey("reminder_time")
+        private val KEY_DARK_MODE = booleanPreferencesKey("dark_mode")
+        private val KEY_FONT_SCALE = stringPreferencesKey("font_scale")
     }
 }
