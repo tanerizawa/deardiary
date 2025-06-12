@@ -46,9 +46,15 @@ class DiaryEntryResponse(
     @model_validator(mode="before")
     def _convert_activities(cls, data):
         if isinstance(data, dict) and isinstance(data.get("activities"), str):
-            data["activities"] = data["activities"].split("|") if data["activities"] else []
+            data["activities"] = (
+                data["activities"].split("|") if data["activities"] else []
+            )
         elif hasattr(data, "activities") and isinstance(data.activities, str):
-            setattr(data, "activities", data.activities.split("|") if data.activities else [])
+            setattr(
+                data,
+                "activities",
+                data.activities.split("|") if data.activities else [],
+            )
         return data
 
 

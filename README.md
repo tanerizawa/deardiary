@@ -109,6 +109,8 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
 
+Setelah backend siap, jalankan `pytest` untuk memverifikasi fungsionalitas API.
+
 ## Konfigurasi Build
 
 Secara default aplikasi menggunakan URL `http://10.0.2.2:8000/` untuk mengakses

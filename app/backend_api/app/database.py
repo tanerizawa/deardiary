@@ -1,7 +1,7 @@
 # app/database.py: Inisialisasi koneksi database dan session SQLAlchemy
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session # Import Session untuk tipe hint
+from sqlalchemy.orm import sessionmaker, Session  # Import Session untuk tipe hint
 
 # URL database. Untuk SQLite, ini adalah path ke file database.
 # Database akan dibuat di root direktori aplikasi FastAPI.
@@ -15,7 +15,7 @@ SQLALCHEMY_DATABASE_URL = "sqlite:///./diary.db"
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL,
     connect_args={"check_same_thread": False},
-    future=True # Mengaktifkan SQLAlchemy 2.0 style
+    future=True,  # Mengaktifkan SQLAlchemy 2.0 style
 )
 
 # Base adalah kelas dasar tempat model database kita akan mewarisi.
@@ -31,14 +31,15 @@ SessionLocal = sessionmaker(
     autocommit=False,
     autoflush=False,
     bind=engine,
-    future=True # Mengaktifkan SQLAlchemy 2.0 style
+    future=True,  # Mengaktifkan SQLAlchemy 2.0 style
 )
+
 
 # Dependency: fungsi untuk mendapatkan sesi database per permintaan.
 # Ini akan digunakan oleh FastAPI untuk setiap request yang membutuhkan akses database.
 def get_db():
-    db: Session = SessionLocal() # Memberikan tipe hint untuk objek db
+    db: Session = SessionLocal()  # Memberikan tipe hint untuk objek db
     try:
-        yield db # Mengembalikan sesi database dan menjaga agar tetap terbuka
+        yield db  # Mengembalikan sesi database dan menjaga agar tetap terbuka
     finally:
-        db.close() # Menutup sesi setelah request selesai (penting!)
+        db.close()  # Menutup sesi setelah request selesai (penting!)
