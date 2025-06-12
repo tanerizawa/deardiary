@@ -73,8 +73,15 @@ function startFastAPI() {
 
   uvicornProcess.on("error", (error) => {
     console.error("Failed to start FastAPI server:", error.message);
-    console.log("Make sure uvicorn is installed:");
-    console.log("cd app/backend_api && pip install uvicorn fastapi");
+    console.log("\nTo fix this issue:");
+    console.log("1. Install pip: apt install python3-pip (on Ubuntu/Debian)");
+    console.log(
+      "2. Install dependencies: cd app/backend_api && pip install -r requirements.txt",
+    );
+    console.log(
+      "3. Or install manually: pip install fastapi uvicorn sqlalchemy pydantic",
+    );
+    console.log("\nAlternatively, use Docker or a Python virtual environment.");
     process.exit(1);
   });
 
