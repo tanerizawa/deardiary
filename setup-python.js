@@ -64,7 +64,15 @@ function installDependencies() {
 
   if (!fs.existsSync(requirementsPath)) {
     console.error("requirements.txt not found in app/backend_api/");
-    process.exit(1);
+    return;
+  }
+
+  if (!pip) {
+    console.log("Skipping Python dependency installation due to missing pip.");
+    console.log(
+      "Python backend setup incomplete. Manual installation required.",
+    );
+    return;
   }
 
   console.log("Installing Python dependencies...");
