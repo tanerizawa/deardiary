@@ -40,7 +40,7 @@
 
 ### Client-Side (Android)
 - **Bahasa**: Kotlin
-- **Framework**: Jetpack Compose
+- **Framework**: Jetpack Compose (menggunakan Google Fonts untuk tipografi)
 - **Penyimpanan Lokal**: Room (SQLite)
 - **API Kesehatan**: Google Fit API
 - **Networking**: Retrofit
@@ -65,7 +65,7 @@
 ## Desain UI/UX
 
 - **Warna**: Biru muda, hijau mint, dan oranye pastel sebagai aksen.
-- **Font**: Roboto / Open Sans.
+- **Font**: Roboto dari Google Fonts melalui Jetpack Compose.
 - **Struktur Navigasi**: Bottom tab bar (Diary, Riwayat, Profil).
 - **Fokus Desain**: Kesederhanaan, keterbacaan, dan kenyamanan visual.
 
