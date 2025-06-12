@@ -44,6 +44,10 @@ fun DiaryFormScreen(
     val keyboardController = LocalSoftwareKeyboardController.current
     val scrollState = rememberScrollState()
 
+    // Observe mood data for summary widget
+    val moodCounts by viewModel.moodCounts.collectAsState()
+    val allEntries by viewModel.allEntries.collectAsState()
+
     // Success message animation
     LaunchedEffect(showSuccessMessage) {
         if (showSuccessMessage) {
