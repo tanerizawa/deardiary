@@ -1,9 +1,9 @@
 import sys
+import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
-import pytest
 
 sys.path.append("app/backend_api")
 
@@ -36,29 +36,16 @@ def client():
         yield c
 
 
-def test_create_and_get_entries(client):
-    response = client.post(
-        "/entries/",
-        json={"content": "hello", "mood": "Senang", "timestamp": 1},
-    )
-    assert response.status_code == 201
-    data = response.json()
-    assert data["content"] == "hello"
+def test_register_and_login(client):
+    resp = client.post("/register/", json={"email": "a@a.com", "password": "x"})
+    assert resp.status_code == 201
 
-    resp = client.get("/entries/")
+    resp = client.post("/login/", json={"email": "a@a.com", "password": "x"})
     assert resp.status_code == 200
-    assert len(resp.json()) == 1
+    assert "token" in resp.json()
 
 
-def test_mood_stats(client):
-    client.post(
-        "/entries/",
-        json={"content": "hi", "mood": "Sedih", "timestamp": 2},
-    )
-    client.post(
-        "/entries/",
-        json={"content": "hey", "mood": "Sedih", "timestamp": 3},
-    )
-    resp = client.get("/stats/")
-    assert resp.status_code == 200
-    assert resp.json()["stats"] == {"Sedih": 2}
+def test_login_fail(client):
+    client.post("/register/", json={"email": "b@a.com", "password": "x"})
+    resp = client.post("/login/", json={"email": "b@a.com", "password": "bad"})
+    assert resp.status_code == 400

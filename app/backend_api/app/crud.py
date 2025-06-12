@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from typing import List, Optional, Dict
+from passlib.context import CryptContext
 
 from . import models, schemas
 
@@ -42,3 +43,26 @@ def get_mood_stats(db: Session) -> Dict[str, int]:
         .all()
     )
     return {mood: count for mood, count in results}
+
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+
+def get_user_by_email(db: Session, email: str) -> Optional[models.User]:
+    return db.query(models.User).filter(models.User.email == email).first()
+
+
+def create_user(db: Session, user: schemas.UserCreate) -> models.User:
+    hashed_password = pwd_context.hash(user.password)
+    db_user = models.User(email=user.email, hashed_password=hashed_password)
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
+
+
+def authenticate_user(db: Session, email: str, password: str) -> bool:
+    user = get_user_by_email(db, email)
+    if not user:
+        return False
+    return pwd_context.verify(password, user.hashed_password)

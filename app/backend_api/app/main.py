@@ -24,6 +24,21 @@ app = FastAPI(
 models.Base.metadata.create_all(bind=engine)
 
 
+@app.post("/register/", status_code=status.HTTP_201_CREATED)
+async def register_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    if crud.get_user_by_email(db, user.email):
+        raise HTTPException(status_code=400, detail="Email already registered")
+    crud.create_user(db, user)
+    return {"message": "User created"}
+
+
+@app.post("/login/", response_model=schemas.Token)
+async def login_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    if not crud.authenticate_user(db, user.email, user.password):
+        raise HTTPException(status_code=400, detail="Invalid credentials")
+    return {"token": "dummy"}
+
+
 # Endpoint untuk membuat entri diary baru
 @app.post(
     "/entries/",  # Menggunakan trailing slash agar konsisten dengan Android
