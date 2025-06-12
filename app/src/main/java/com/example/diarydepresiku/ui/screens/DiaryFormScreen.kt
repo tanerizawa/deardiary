@@ -26,6 +26,7 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 import com.example.diarydepresiku.DiaryViewModel
 import com.example.diarydepresiku.ui.components.MoodSelector
+import com.example.diarydepresiku.ui.components.MoodSummaryWidget
 import com.example.diarydepresiku.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,7 +40,7 @@ fun DiaryFormScreen(
     var selectedMood by remember { mutableStateOf<String?>(null) }
     var showSuccessMessage by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
-    
+
     val keyboardController = LocalSoftwareKeyboardController.current
     val scrollState = rememberScrollState()
 
@@ -67,7 +68,7 @@ fun DiaryFormScreen(
     ) {
         // Header with date
         DiaryHeader()
-        
+
         Spacer(modifier = Modifier.height(24.dp))
 
         // Mood Selector
@@ -138,12 +139,12 @@ fun DiaryFormScreen(
                 if (content.isNotBlank() && selectedMood != null) {
                     isLoading = true
                     keyboardController?.hide()
-                    
+
                     viewModel.saveDiaryEntry(
                         content = content,
                         mood = selectedMood!!
                     )
-                    
+
                     // Reset form
                     content = ""
                     selectedMood = null
@@ -156,9 +157,9 @@ fun DiaryFormScreen(
                 .height(56.dp),
             enabled = content.isNotBlank() && selectedMood != null && !isLoading,
             colors = ButtonDefaults.buttonColors(
-                containerColor = if (content.isNotBlank() && selectedMood != null) 
+                containerColor = if (content.isNotBlank() && selectedMood != null)
                     SoftBlueDark else Gray200,
-                contentColor = if (content.isNotBlank() && selectedMood != null) 
+                contentColor = if (content.isNotBlank() && selectedMood != null)
                     Color.White else TextHint
             ),
             shape = RoundedCornerShape(28.dp)
@@ -255,9 +256,9 @@ private fun DiaryHeader() {
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
         )
-        
+
         Spacer(modifier = Modifier.height(8.dp))
-        
+
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
