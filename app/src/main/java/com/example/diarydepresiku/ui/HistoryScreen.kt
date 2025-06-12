@@ -25,12 +25,14 @@ fun HistoryScreen(
 ) {
     val diaryEntries = viewModel.diaryEntries.collectAsState().value
     val dateFormat = remember { SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.getDefault()) }
-
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
+        item {
+            MoodCalendar(viewModel = viewModel)
+        }
         items(diaryEntries) { entry ->
             Column(modifier = Modifier.padding(bottom = 8.dp)) {
                 val date = dateFormat.format(Date(entry.creationTimestamp))
