@@ -38,12 +38,9 @@ import androidx.compose.material3.TextButton
 import com.example.diarydepresiku.DiaryViewModel
 import com.example.diarydepresiku.DiaryViewModelFactory // Pastikan ini diimpor
 import com.example.diarydepresiku.MyApplication // Pastikan ini diimpor
-import com.example.diarydepresiku.ReminderPreferences
 import com.example.diarydepresiku.ContentViewModel
 import com.example.diarydepresiku.ui.theme.DiarydepresikuTheme // Pastikan ini diimpor
 import com.example.diarydepresiku.ui.theme.SoftYellow
-import com.example.diarydepresiku.ui.MoodSlider
-
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
