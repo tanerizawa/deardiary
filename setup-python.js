@@ -39,8 +39,17 @@ function checkPip() {
         execSync(`${python} -m ensurepip --user`, { stdio: "inherit" });
         return "pip3";
       } catch (error3) {
-        console.error("Failed to install pip. Please install pip manually.");
-        process.exit(1);
+        console.warn(
+          "pip not available. Dependencies will need to be installed manually.",
+        );
+        console.log("To install dependencies manually:");
+        console.log(
+          "1. Install pip: apt install python3-pip (on Ubuntu/Debian)",
+        );
+        console.log(
+          "2. Install dependencies: cd app/backend_api && pip install -r requirements.txt",
+        );
+        return null;
       }
     }
   }
