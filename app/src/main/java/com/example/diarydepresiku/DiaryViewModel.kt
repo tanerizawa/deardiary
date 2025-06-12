@@ -215,28 +215,4 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
         return streak
     }
 
-    // TODO: Tambahkan fungsi lain untuk operasi CRUD (update, delete, getById) jika diperlukan
-    /*
-    fun updateEntry(entry: DiaryEntry) {
-        viewModelScope.launch {
-            try {
-                repository.updateEntry(entry)
-                _statusMessage.value = "Entri berhasil diperbarui!"
-            } catch (e: Exception) {
-                _statusMessage.value = "Gagal memperbarui entri: ${e.localizedMessage}"
-            }
-        }
-    }
-
-    fun deleteEntry(entry: DiaryEntry) {
-        viewModelScope.launch {
-            try {
-                repository.deleteEntry(entry)
-                _statusMessage.value = "Entri berhasil dihapus!"
-            } catch (e: Exception) {
-                _statusMessage.value = "Gagal menghapus entri: ${e.localizedMessage}"
-            }
-        }
-    }
-    */
 }
