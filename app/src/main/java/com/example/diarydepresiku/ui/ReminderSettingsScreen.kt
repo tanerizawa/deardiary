@@ -8,6 +8,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.example.diarydepresiku.ui.theme.SoftYellow
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Lock
 import com.example.diarydepresiku.ReminderPreferences
 import com.example.diarydepresiku.cancelDailyReminder
 import com.example.diarydepresiku.scheduleDailyReminder
@@ -89,6 +92,25 @@ fun ReminderSettingsScreen(
                 onClick = { coroutineScope.launch { prefs.setFontScale(1.3f) } }
             )
             Text("Large")
+        }
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .padding(top = 8.dp)
+                .fillMaxWidth()
+        ) {
+            Icon(
+                Icons.Default.Lock,
+                contentDescription = null,
+                tint = SoftYellow
+            )
+            Spacer(Modifier.width(4.dp))
+            Text(
+                text = "Privasi Anda terlindungi dengan enkripsi end-to-end.",
+                color = SoftYellow,
+                style = MaterialTheme.typography.labelSmall
+            )
         }
     }
 }

@@ -25,12 +25,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CloudOff
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Icon
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.Alignment
 import com.example.diarydepresiku.DiaryViewModel
 import com.example.diarydepresiku.DiaryViewModelFactory // Pastikan ini diimpor
 import com.example.diarydepresiku.MyApplication // Pastikan ini diimpor
 import com.example.diarydepresiku.ui.theme.DiarydepresikuTheme // Pastikan ini diimpor
+import com.example.diarydepresiku.ui.theme.SoftYellow
 import com.example.diarydepresiku.ui.MoodSlider
 
 import java.text.SimpleDateFormat
@@ -95,6 +98,23 @@ fun DiaryFormScreen(
             enabled = diaryText.isNotBlank()
         ) {
             Text(text = "Simpan Entri")
+        }
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(top = 4.dp)
+        ) {
+            Icon(
+                Icons.Default.Lock,
+                contentDescription = null,
+                tint = SoftYellow
+            )
+            Spacer(Modifier.width(4.dp))
+            Text(
+                text = "Privasi Anda terlindungi dengan enkripsi end-to-end.",
+                color = SoftYellow,
+                style = MaterialTheme.typography.labelSmall
+            )
         }
 
         statusMessage?.let { message ->
