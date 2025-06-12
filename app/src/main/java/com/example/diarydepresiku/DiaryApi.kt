@@ -55,6 +55,10 @@ data class AnalyzeResponse(
     @SerializedName("analysis") val analysis: String
 )
 
+data class GeminiArticlesRequest(
+    @SerializedName("text") val text: String
+)
+
 /**
  * DiaryApi: Interface Retrofit untuk berkomunikasi dengan backend FastAPI.
  * Mendefinisikan semua endpoint API yang akan digunakan aplikasi.
@@ -85,6 +89,9 @@ interface DiaryApi {
 
     @POST("analyze")
     suspend fun analyzeEntry(@Body request: AnalyzeRequest): Response<AnalyzeResponse>
+
+    @POST("gemini_articles/")
+    suspend fun geminiArticles(@Body request: GeminiArticlesRequest): Response<List<com.example.diarydepresiku.content.EducationalArticle>>
 
     // (Opsional) Endpoint lain dapat didefinisikan di sini, misalnya:
     // @GET("entries/")
