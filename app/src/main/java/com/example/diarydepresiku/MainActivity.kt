@@ -21,15 +21,13 @@ import androidx.compose.material.icons.filled.Article
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.automirrored.filled.Article // ✅ Gunakan versi AutoMirrored
 
-import com.example.diarydepresiku.ui.components.AnimatedFab
-
 import com.example.diarydepresiku.ui.theme.DiarydepresikuTheme
-import com.example.diarydepresiku.ui.screens.DiaryFormScreen
-import com.example.diarydepresiku.ui.screens.HistoryScreen
-import com.example.diarydepresiku.ui.screens.ContentScreen
-import com.example.diarydepresiku.ui.screens.SettingsScreen
+import com.example.diarydepresiku.ui.DiaryFormScreen
+import com.example.diarydepresiku.ui.MoodAnalysisScreen
+import com.example.diarydepresiku.ui.EducationalContentScreen
 import com.example.diarydepresiku.ContentViewModel
 import com.example.diarydepresiku.ContentViewModelFactory
+import com.example.diarydepresiku.ui.ReminderSettingsScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,24 +65,20 @@ class MainActivity : ComponentActivity() {
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     floatingActionButton = {
-                        AnimatedFab(
+                        FloatingActionButton(
                             onClick = {
                                 navController.navigate("form") {
                                     popUpTo(navController.graph.startDestinationId) { inclusive = false }
                                     launchSingleTop = true
                                 }
-                            },
-                            isExpanded = currentRoute != "form",
-                            icon = Icons.Filled.Edit,
-                            text = "Tulis Diary"
-                        )
+                            }
+                        ) {
+                            Icon(Icons.Filled.Edit, contentDescription = "New Entry")
+                        }
                     },
                     floatingActionButtonPosition = FabPosition.Center,
                     bottomBar = {
-                        NavigationBar(
-                            containerColor = MaterialTheme.colorScheme.surface,
-                            contentColor = MaterialTheme.colorScheme.onSurface
-                        ) {
+                        NavigationBar {
                             NavigationBarItem(
                                 selected = currentRoute == "form",
                                 onClick = {
@@ -93,20 +87,20 @@ class MainActivity : ComponentActivity() {
                                         launchSingleTop = true
                                     }
                                 },
-                                icon = { Icon(Icons.Filled.Edit, contentDescription = "Tulis Diary") },
+                                icon = { Icon(Icons.Filled.Edit, contentDescription = "Diary") },
                                 label = { Text("Diary") },
                                 alwaysShowLabel = true
                             )
                             NavigationBarItem(
-                                selected = currentRoute == "history",
+                                selected = currentRoute == "analysis",
                                 onClick = {
-                                    navController.navigate("history") {
+                                    navController.navigate("analysis") {
                                         popUpTo(navController.graph.startDestinationId) { inclusive = false }
                                         launchSingleTop = true
                                     }
                                 },
-                                icon = { Icon(Icons.Filled.Insights, contentDescription = "Riwayat & Analisis") },
-                                label = { Text("Riwayat") },
+                                icon = { Icon(Icons.Filled.Insights, contentDescription = "Analysis") },
+                                label = { Text("Analysis") },
                                 alwaysShowLabel = true
                             )
                             NavigationBarItem(
@@ -117,8 +111,8 @@ class MainActivity : ComponentActivity() {
                                         launchSingleTop = true
                                     }
                                 },
-                                icon = { Icon(Icons.AutoMirrored.Filled.Article, contentDescription = "Konten Edukatif") },
-                                label = { Text("Konten") },
+                                icon = { Icon(Icons.AutoMirrored.Filled.Article, contentDescription = "Content") },
+                                label = { Text("Content") },
                                 alwaysShowLabel = true
                             )
 
@@ -130,10 +124,11 @@ class MainActivity : ComponentActivity() {
                                         launchSingleTop = true
                                     }
                                 },
-                                icon = { Icon(Icons.Default.Settings, contentDescription = "Pengaturan") },
-                                label = { Text("Pengaturan") },
+                                icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
+                                label = { Text("Settings") },
                                 alwaysShowLabel = true
                             )
+
                         }
                     }
                 ) { innerPadding ->
@@ -148,16 +143,17 @@ class MainActivity : ComponentActivity() {
                                 onNavigateToContent = { navController.navigate("content") }
                             )
                         }
-                        composable("history") {
-                            HistoryScreen(
-                                viewModel = diaryViewModel
+                        composable("analysis") {
+                            MoodAnalysisScreen(
+                                viewModel = diaryViewModel,
+                                onNavigateToContent = { navController.navigate("content") }
                             )
                         }
                         composable("content") {
-                            ContentScreen(viewModel = contentViewModel)
+                            EducationalContentScreen(viewModel = contentViewModel)
                         }
                         composable("settings") {
-                            SettingsScreen(prefs = application.reminderPreferences)
+                            ReminderSettingsScreen(prefs = application.reminderPreferences)
                         }
                     }
                 }

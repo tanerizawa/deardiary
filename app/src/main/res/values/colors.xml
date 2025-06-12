@@ -1,46 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Mental Health Theme Colors - Calming Pastels -->
-
-    <!-- Primary Colors - Soft Blues -->
-    <color name="soft_blue_light">#E3F2FD</color>
-    <color name="soft_blue">#90CAF9</color>
-    <color name="soft_blue_dark">#42A5F5</color>
-
-    <!-- Secondary Colors - Mint Green -->
-    <color name="mint_light">#E8F5E8</color>
-    <color name="mint_green">#A5D6A7</color>
-    <color name="mint_dark">#66BB6A</color>
-
-    <!-- Accent Colors - Warm Pastels -->
-    <color name="peach_light">#FFF3E0</color>
-    <color name="peach">#FFCC80</color>
-    <color name="peach_dark">#FF9800</color>
-
-    <!-- Neutral Colors -->
-    <color name="gray_50">#FAFAFA</color>
-    <color name="gray_100">#F5F5F5</color>
-    <color name="gray_200">#EEEEEE</color>
-    <color name="gray_400">#BDBDBD</color>
-    <color name="gray_600">#757575</color>
-    <color name="gray_800">#424242</color>
-
-    <!-- Status Colors -->
-    <color name="success_light">#E8F5E8</color>
-    <color name="success">#4CAF50</color>
-    <color name="warning_light">#FFF8E1</color>
-    <color name="warning">#FFC107</color>
-    <color name="error_light">#FFEBEE</color>
-    <color name="error">#F44336</color>
-
-    <!-- Basic Colors -->
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
-
-    <!-- Legacy support -->
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
 </resources>
