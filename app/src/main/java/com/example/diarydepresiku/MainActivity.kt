@@ -15,7 +15,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.*
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Person
@@ -77,7 +77,7 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                         ) {
-                            Icon(Icons.Filled.Edit, contentDescription = "New Entry")
+                            Icon(Icons.Default.Add, contentDescription = "New Entry")
                         }
                     },
                     floatingActionButtonPosition = FabPosition.Center,
