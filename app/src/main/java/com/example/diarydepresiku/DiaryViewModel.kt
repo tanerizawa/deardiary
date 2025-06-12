@@ -122,11 +122,11 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
      * Dipanggil dari UI dengan content dan mood.
      * Menggunakan coroutine untuk menjalankan operasi I/O di background.
      */
-    fun saveEntry(content: String, mood: String) {
+    fun saveEntry(content: String, mood: String, activities: List<String>) {
         // Meluncurkan coroutine dalam viewModelScope
         viewModelScope.launch {
             try {
-                val status = repository.addEntry(content, mood)
+                val status = repository.addEntry(content, mood, activities)
                 _statusMessage.value = if (status == EntryStatus.ONLINE) {
                     "Entri berhasil disimpan!"
                 } else {

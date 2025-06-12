@@ -10,7 +10,13 @@ def create_diary_entry(
     db: Session, entry: schemas.DiaryEntryCreate
 ) -> models.DiaryEntry:
     """Create a new diary entry and persist it to the database."""
-    db_entry = models.DiaryEntry(**entry.model_dump())
+    data = entry.model_dump()
+    db_entry = models.DiaryEntry(
+        content=data["content"],
+        mood=data["mood"],
+        timestamp=data["timestamp"],
+        activities="|".join(data.get("activities", [])),
+    )
     db.add(db_entry)
     db.commit()
     db.refresh(db_entry)

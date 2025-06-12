@@ -13,12 +13,13 @@ class DiaryRepository(
     private val achievementDao: AchievementDao
 ) {
 
-    suspend fun addEntry(content: String, mood: String): EntryStatus {
+    suspend fun addEntry(content: String, mood: String, activities: List<String>): EntryStatus {
         val currentTimestamp = System.currentTimeMillis()
 
         val localEntry = DiaryEntry(
             content = content,
             mood = mood,
+            activities = activities,
             creationTimestamp = currentTimestamp
         )
 
@@ -31,7 +32,8 @@ class DiaryRepository(
         val remoteRequest = DiaryEntryRequest( // Membutuhkan definisi DiaryEntryRequest
             content = content,
             mood = mood,
-            timestamp = currentTimestamp
+            timestamp = currentTimestamp,
+            activities = activities
         )
 
         val status = withContext(Dispatchers.IO) {

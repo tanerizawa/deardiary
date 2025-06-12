@@ -19,7 +19,7 @@ import com.example.diarydepresiku.content.EducationalArticleEntity
  */
 @Database(
     entities = [DiaryEntry::class, EducationalArticleEntity::class, Achievement::class],
-    version = 3,
+    version = 4,
     exportSchema = false
 )
 @TypeConverters(Converters::class) // **PENTING: Daftarkan kelas TypeConverter di sini**

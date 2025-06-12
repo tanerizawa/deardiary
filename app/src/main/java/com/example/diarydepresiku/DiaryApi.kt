@@ -15,7 +15,8 @@ import retrofit2.http.*
 data class DiaryEntryRequest(
     @SerializedName("content") val content: String, // Sesuaikan dengan nama properti di backend
     @SerializedName("mood") val mood: String,
-    @SerializedName("timestamp") val timestamp: Long // Jika backend mengharapkan Unix timestamp (Long)
+    @SerializedName("timestamp") val timestamp: Long, // Jika backend mengharapkan Unix timestamp (Long)
+    @SerializedName("activities") val activities: List<String> = emptyList()
 )
 
 /**
@@ -27,6 +28,7 @@ data class DiaryEntryResponse(
     @SerializedName("content") val content: String, // Sesuaikan dengan nama properti di backend
     @SerializedName("mood") val mood: String,
     @SerializedName("timestamp") val timestamp: Long, // Jika backend mengembalikan Unix timestamp (Long)
+    @SerializedName("activities") val activities: List<String> = emptyList(),
     @SerializedName("message") val message: String? = null // Contoh properti opsional dari server
 )
 
