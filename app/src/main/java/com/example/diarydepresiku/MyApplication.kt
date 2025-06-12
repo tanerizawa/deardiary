@@ -68,7 +68,7 @@ class MyApplication : Application() {
     }
 
     val contentRepository: ContentRepository by lazy {
-        ContentRepository(newsApi, articleDao, reactionDao, this)
+        ContentRepository(newsApi, diaryApi, articleDao, reactionDao, this)
     }
 
     val reminderPreferences: ReminderPreferences by lazy {

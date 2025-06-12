@@ -13,6 +13,7 @@ import kotlinx.coroutines.withContext
 
 open class ContentRepository(
     private val api: NewsApiService,
+    private val diaryApi: com.example.diarydepresiku.DiaryApi,
     private val dao: EducationalArticleDao,
     private val reactionDao: ArticleReactionDao,
     private val context: Context
@@ -31,6 +32,21 @@ open class ContentRepository(
     ): List<EducationalArticle> =
         withContext(Dispatchers.IO) {
             if (isNetworkAvailable()) {
+                if (!query.isNullOrBlank()) {
+                    try {
+                        val gemini = diaryApi.geminiArticles(
+                            com.example.diarydepresiku.GeminiArticlesRequest(query)
+                        )
+                        if (gemini.isSuccessful) {
+                            val articles = gemini.body() ?: emptyList()
+                            dao.clearAll()
+                            dao.insertArticles(articles.map { it.toEntity() })
+                            return@withContext articles
+                        }
+                    } catch (_: Exception) {
+                        // fall back to NewsAPI
+                    }
+                }
                 try {
                     val response = if (!query.isNullOrBlank()) {
                         api.searchArticles(apiKey, query)

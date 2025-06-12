@@ -13,6 +13,12 @@ import okhttp3.ResponseBody
 
 // Status flag for uploads
 import com.example.diarydepresiku.EntryStatus
+import com.example.diarydepresiku.AuthRequest
+import com.example.diarydepresiku.TokenResponse
+import com.example.diarydepresiku.AnalyzeRequest
+import com.example.diarydepresiku.AnalyzeResponse
+import com.example.diarydepresiku.GeminiArticlesRequest
+import com.example.diarydepresiku.content.EducationalArticle
 
 class FakeDiaryDao : DiaryDao {
     val entries = mutableListOf<DiaryEntry>()
@@ -40,6 +46,12 @@ class FakeDiaryApi : DiaryApi {
     override suspend fun getMoodStats(): Response<MoodStatsResponse> {
         return Response.success(MoodStatsResponse(mapOf("Senang" to 1)))
     }
+    override suspend fun register(request: AuthRequest): Response<Unit> = Response.success(Unit)
+    override suspend fun login(request: AuthRequest): Response<TokenResponse> = Response.success(TokenResponse("token"))
+    override suspend fun analyzeEntry(request: AnalyzeRequest): Response<AnalyzeResponse> =
+        Response.success(AnalyzeResponse("ok"))
+    override suspend fun geminiArticles(request: GeminiArticlesRequest): Response<List<EducationalArticle>> =
+        Response.success(emptyList())
 }
 
 class FailingDiaryApi : DiaryApi {
@@ -50,6 +62,12 @@ class FailingDiaryApi : DiaryApi {
     override suspend fun getMoodStats(): Response<MoodStatsResponse> {
         return Response.success(MoodStatsResponse(emptyMap()))
     }
+    override suspend fun register(request: AuthRequest): Response<Unit> = Response.success(Unit)
+    override suspend fun login(request: AuthRequest): Response<TokenResponse> = Response.success(TokenResponse("token"))
+    override suspend fun analyzeEntry(request: AnalyzeRequest): Response<AnalyzeResponse> =
+        Response.success(AnalyzeResponse(""))
+    override suspend fun geminiArticles(request: GeminiArticlesRequest): Response<List<EducationalArticle>> =
+        Response.error(500, okhttp3.ResponseBody.create(null, ""))
 }
 
 class DiaryRepositoryTest {
