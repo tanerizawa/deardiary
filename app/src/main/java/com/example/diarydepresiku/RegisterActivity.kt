@@ -27,9 +27,12 @@ class RegisterActivity : ComponentActivity() {
             DiarydepresikuTheme {
                 RegisterScreen { email, password, name ->
                     lifecycleScope.launch {
-                        val api = (application as MyApplication).diaryApi
-                        val resp = api.register(AuthRequest(email, password, name))
-                        if (resp.isSuccessful) finish()
+                        val app = application as MyApplication
+                        val resp = app.diaryApi.register(AuthRequest(email, password, name))
+                        if (resp.isSuccessful) {
+                            app.reminderPreferences.setUserName(name)
+                            finish()
+                        }
                     }
                 }
             }
