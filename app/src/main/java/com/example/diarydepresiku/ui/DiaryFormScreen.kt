@@ -31,10 +31,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.FilterChip
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.Alignment
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
 import com.example.diarydepresiku.DiaryViewModel
 import com.example.diarydepresiku.DiaryViewModelFactory // Pastikan ini diimpor
 import com.example.diarydepresiku.MyApplication // Pastikan ini diimpor
 import com.example.diarydepresiku.ReminderPreferences
+import com.example.diarydepresiku.ContentViewModel
 import com.example.diarydepresiku.ui.theme.DiarydepresikuTheme // Pastikan ini diimpor
 import com.example.diarydepresiku.ui.theme.SoftYellow
 import com.example.diarydepresiku.ui.MoodSlider
@@ -51,6 +54,7 @@ val activityOptions = listOf("Olahraga", "Membaca", "Bersosialisasi", "Bekerja",
 @Composable
 fun DiaryFormScreen(
     viewModel: DiaryViewModel,
+    contentViewModel: ContentViewModel,
     modifier: Modifier = Modifier,
     onNavigateToContent: (() -> Unit)? = null
 ) {
@@ -60,7 +64,16 @@ fun DiaryFormScreen(
 
     val diaryEntries by viewModel.diaryEntries.collectAsState()
     val statusMessage by viewModel.statusMessage.collectAsState()
+    val analysisResult by viewModel.analysisResult.collectAsState()
+    val articles by contentViewModel.articles.collectAsState()
+    var showDialog by remember { mutableStateOf(false) }
     val dateFormat = remember { SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.getDefault()) }
+    LaunchedEffect(analysisResult) {
+        if (analysisResult != null) {
+            contentViewModel.refreshArticles(filterMood = analysisResult)
+            showDialog = true
+        }
+    }
     val prefs = (LocalContext.current.applicationContext as MyApplication).reminderPreferences
     val userName by prefs.userName.collectAsState(initial = "")
 
@@ -171,19 +184,24 @@ fun DiaryFormScreen(
                     color = if (message.contains("gagal", ignoreCase = true)) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(top = 8.dp)
                 )
-                if (!message.contains("gagal", ignoreCase = true)) {
-                    onNavigateToContent?.let {
-                        Button(
-                            onClick = it,
-                            modifier = Modifier
-                                .padding(top = 8.dp)
-                                .fillMaxWidth()
-                        ) {
-                            Text("Lihat Artikel")
-                        }
-                    }
-                }
+                // Button navigasi dipindahkan ke dialog hasil analisis
             }
+        }
+
+        if (showDialog && analysisResult != null) {
+            AnalysisDialog(
+                analysis = analysisResult!!,
+                articleTitles = articles.take(3).mapNotNull { it.title },
+                onDismiss = {
+                    showDialog = false
+                    viewModel.clearAnalysisResult()
+                },
+                onViewArticles = {
+                    showDialog = false
+                    viewModel.clearAnalysisResult()
+                    onNavigateToContent?.invoke()
+                }
+            )
         }
 
         Spacer(Modifier.height(16.dp))
@@ -201,6 +219,34 @@ fun DiaryFormScreen(
     }
 }
 
+@Composable
+private fun AnalysisDialog(
+    analysis: String,
+    articleTitles: List<String>,
+    onDismiss: () -> Unit,
+    onViewArticles: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = onViewArticles) { Text("Lihat Artikel") }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("Tutup") }
+        },
+        title = { Text(text = "Mood Dominan") },
+        text = {
+            Column {
+                Text(analysis)
+                Spacer(Modifier.height(8.dp))
+                articleTitles.forEach { title ->
+                    Text("\u2022 $title", style = MaterialTheme.typography.bodySmall)
+                }
+            }
+        }
+    )
+}
+
 // Preview composable untuk DiaryFormScreen
 @Preview(showBackground = true, widthDp = 320)
 @Composable
@@ -214,8 +260,17 @@ fun DiaryFormScreenPreview() {
     val context = LocalContext.current.applicationContext
     if (context is MyApplication) {
         val factory = DiaryViewModelFactory(application = context)
+        val diaryVm: DiaryViewModel = viewModel(factory = factory)
+        val contentFactory = ContentViewModelFactory(
+            repository = context.contentRepository,
+            diaryViewModel = diaryVm
+        )
+        val contentVm: ContentViewModel = viewModel(factory = contentFactory)
         DiarydepresikuTheme {
-            DiaryFormScreen(viewModel = viewModel(factory = factory))
+            DiaryFormScreen(
+                viewModel = diaryVm,
+                contentViewModel = contentVm
+            )
         }
     } else {
         DiarydepresikuTheme {

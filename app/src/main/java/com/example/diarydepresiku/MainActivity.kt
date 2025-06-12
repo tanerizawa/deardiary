@@ -131,6 +131,7 @@ class MainActivity : ComponentActivity() {
                         composable("form") {
                             DiaryFormScreen(
                                 viewModel = diaryViewModel,
+                                contentViewModel = contentViewModel,
                                 onNavigateToContent = { navController.navigate("content") }
                             )
                         }
