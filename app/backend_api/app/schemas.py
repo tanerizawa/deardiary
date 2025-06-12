@@ -59,6 +59,12 @@ class MoodStatsResponse(BaseModel):
 class UserCreate(BaseModel):
     email: str
     password: str
+    name: str
+
+
+class UserLogin(BaseModel):
+    email: str
+    password: str
 
 
 class Token(BaseModel):

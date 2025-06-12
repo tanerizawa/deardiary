@@ -25,10 +25,10 @@ class RegisterActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             DiarydepresikuTheme {
-                RegisterScreen { email, password ->
+                RegisterScreen { email, password, name ->
                     lifecycleScope.launch {
                         val api = (application as MyApplication).diaryApi
-                        val resp = api.register(AuthRequest(email, password))
+                        val resp = api.register(AuthRequest(email, password, name))
                         if (resp.isSuccessful) finish()
                     }
                 }
@@ -38,9 +38,10 @@ class RegisterActivity : ComponentActivity() {
 }
 
 @Composable
-fun RegisterScreen(onRegister: (String, String) -> Unit) {
+fun RegisterScreen(onRegister: (String, String, String) -> Unit) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var name by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -48,6 +49,13 @@ fun RegisterScreen(onRegister: (String, String) -> Unit) {
             .padding(16.dp),
         verticalArrangement = Arrangement.Center
     ) {
+        OutlinedTextField(
+            value = name,
+            onValueChange = { name = it },
+            label = { Text("Name") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(Modifier.height(8.dp))
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
@@ -63,7 +71,10 @@ fun RegisterScreen(onRegister: (String, String) -> Unit) {
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(Modifier.height(8.dp))
-        Button(onClick = { onRegister(email, password) }, modifier = Modifier.fillMaxWidth()) {
+        Button(
+            onClick = { onRegister(email, password, name) },
+            modifier = Modifier.fillMaxWidth()
+        ) {
             Text("Register")
         }
 
