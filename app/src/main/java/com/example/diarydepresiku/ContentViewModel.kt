@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.diarydepresiku.content.ContentRepository
 import com.example.diarydepresiku.content.EducationalArticle
+import com.example.diarydepresiku.BuildConfig
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -46,19 +47,13 @@ class ContentViewModel(
                 ?: _dominantMood.value
                 ?: diaryViewModel?.moodCounts?.value?.maxByOrNull { it.value }?.key
 
-            val allArticles = repository.getArticles(apiKey = "")
-            if (mood.isNullOrBlank()) {
-                _articles.value = allArticles
-                _highlightMood.value = null
-            } else {
-                val matched = allArticles.filter { article ->
-                    article.title?.contains(mood, ignoreCase = true) == true ||
-                        article.description?.contains(mood, ignoreCase = true) == true
-                }
-                val others = allArticles.filterNot { matched.contains(it) }
-                _articles.value = matched + others
-                _highlightMood.value = mood
-            }
+            val allArticles = repository.getArticles(
+                apiKey = BuildConfig.NEWS_API_KEY,
+                query = mood
+            )
+
+            _articles.value = allArticles
+            _highlightMood.value = mood
         }
     }
 }
