@@ -3,6 +3,7 @@ package com.example.diarydepresiku.ui
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -13,7 +14,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun ProfileScreen(viewModel: DiaryViewModel, modifier: Modifier = Modifier) {
+fun ProfileScreen(
+    viewModel: DiaryViewModel,
+    onNavigateToSettings: (() -> Unit)? = null,
+    modifier: Modifier = Modifier
+) {
     val achievements by viewModel.achievements.collectAsState()
     val streak by viewModel.entryStreak.collectAsState()
 
@@ -28,6 +33,11 @@ fun ProfileScreen(viewModel: DiaryViewModel, modifier: Modifier = Modifier) {
             Text(text = "Badges:", style = MaterialTheme.typography.titleMedium)
             achievements.forEach { badge ->
                 Text(text = badge.name)
+            }
+        }
+        onNavigateToSettings?.let {
+            Button(onClick = it, modifier = Modifier.padding(top = 16.dp)) {
+                Text("Settings")
             }
         }
     }

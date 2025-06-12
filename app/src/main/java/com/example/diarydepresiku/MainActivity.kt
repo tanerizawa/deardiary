@@ -19,7 +19,6 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Settings
 
 import com.example.diarydepresiku.ui.theme.DiarydepresikuTheme
 import com.example.diarydepresiku.ui.DiaryFormScreen
@@ -120,18 +119,6 @@ class MainActivity : ComponentActivity() {
                                 label = { Text("Profile") },
                                 alwaysShowLabel = true
                             )
-                            NavigationBarItem(
-                                selected = currentRoute == "settings",
-                                onClick = {
-                                    navController.navigate("settings") {
-                                        popUpTo(navController.graph.startDestinationId) { inclusive = false }
-                                        launchSingleTop = true
-                                    }
-                                },
-                                icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
-                                label = { Text("Settings") },
-                                alwaysShowLabel = true
-                            )
 
                         }
                     }
@@ -157,7 +144,15 @@ class MainActivity : ComponentActivity() {
                             HistoryScreen(viewModel = diaryViewModel)
                         }
                         composable("profile") {
-                            ProfileScreen(viewModel = diaryViewModel)
+                            ProfileScreen(
+                                viewModel = diaryViewModel,
+                                onNavigateToSettings = {
+                                    navController.navigate("settings") {
+                                        popUpTo(navController.graph.startDestinationId) { inclusive = false }
+                                        launchSingleTop = true
+                                    }
+                                }
+                            )
                         }
                         composable("content") {
                             EducationalContentScreen(viewModel = contentViewModel)
