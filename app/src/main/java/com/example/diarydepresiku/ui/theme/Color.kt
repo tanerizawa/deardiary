@@ -14,5 +14,5 @@ val Gray40 = Color(0xFFD5D8DC)     // Medium gray
 
 // Warna Aksen / Error
 val RedSoft = Color(0xFFEF9A9A)    // Merah pastel
-val YellowSoft = Color(0xFFFFF59D) // Kuning pastel untuk perhatian ringan
+val SoftYellow = Color(0xFFF8C471) // Kuning pastel lembut untuk aksen/peringatan
 val TextOnPrimary = Color(0xFF1B1B1B) // Teks gelap
