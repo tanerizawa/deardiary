@@ -145,17 +145,16 @@ class MainActivity : ComponentActivity() {
                                 onNavigateToContent = { navController.navigate("content") }
                             )
                         }
-                        composable("analysis") {
-                            MoodAnalysisScreen(
-                                viewModel = diaryViewModel,
-                                onNavigateToContent = { navController.navigate("content") }
+                        composable("history") {
+                            HistoryScreen(
+                                viewModel = diaryViewModel
                             )
                         }
                         composable("content") {
-                            EducationalContentScreen(viewModel = contentViewModel)
+                            ContentScreen(viewModel = contentViewModel)
                         }
                         composable("settings") {
-                            ReminderSettingsScreen(prefs = application.reminderPreferences)
+                            SettingsScreen(prefs = application.reminderPreferences)
                         }
                     }
                 }
