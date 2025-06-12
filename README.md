@@ -106,6 +106,16 @@ cd diary-depresiku
 ./gradlew installDebug
 cd app/backend_api
 pip install -r requirements.txt
+export GEMINI_API_KEY=your-gemini-api-key
+uvicorn app.main:app --reload
+```
+
+Anda juga dapat menyimpan kunci di file `.env` dan memuatnya sebelum
+menjalankan backend:
+
+```bash
+echo "GEMINI_API_KEY=your-gemini-api-key" > .env
+set -a && source .env && set +a
 uvicorn app.main:app --reload
 ```
 
