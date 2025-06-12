@@ -1,12 +1,7 @@
 package com.example.diarydepresiku.ui // Pastikan package ini sesuai dengan struktur folder Anda
 
-import android.app.Application // Diperlukan untuk Preview ViewModel
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi // <<< PENTING: Untuk FlowRow
-import androidx.compose.foundation.layout.FlowRow // <<< PENTING: Untuk FlowRow
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -15,7 +10,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api // <<< PENTING: Untuk Material3 API tertentu (jika ada)
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -23,7 +17,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext // Diperlukan untuk Preview ViewModel
 import androidx.compose.ui.tooling.preview.Preview
@@ -33,15 +26,16 @@ import com.example.diarydepresiku.DiaryViewModel
 import com.example.diarydepresiku.DiaryViewModelFactory // Pastikan ini diimpor
 import com.example.diarydepresiku.MyApplication // Pastikan ini diimpor
 import com.example.diarydepresiku.ui.theme.DiarydepresikuTheme // Pastikan ini diimpor
+import com.example.diarydepresiku.ui.MoodSlider
 
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 // Daftar pilihan mood yang tersedia - Pindahkan di sini atau di file tersendiri
-val moodOptions = listOf("Senang", "Tersipu", "Sedih", "Cemas", "Marah")
+val moodOptions = listOf("Senang", "Cemas", "Sedih", "Marah")
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class) // <<< Anotasi @OptIn untuk FlowRow
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DiaryFormScreen(
     viewModel: DiaryViewModel,
@@ -76,25 +70,11 @@ fun DiaryFormScreen(
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(top = 8.dp)
         )
-        // Menggunakan FlowRow untuk layout yang lebih fleksibel
-        FlowRow(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            moodOptions.forEach { mood ->
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.clickable { selectedMood = mood }
-                ) {
-                    RadioButton(
-                        selected = (mood == selectedMood),
-                        onClick = { selectedMood = mood }
-                    )
-                    Text(text = mood)
-                }
-            }
-        }
+        MoodSlider(
+            selectedMood = selectedMood,
+            onMoodChange = { selectedMood = it },
+            modifier = Modifier.fillMaxWidth()
+        )
 
         Spacer(Modifier.height(16.dp))
 
