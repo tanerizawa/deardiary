@@ -78,7 +78,10 @@ class MainActivity : ComponentActivity() {
                     },
                     floatingActionButtonPosition = FabPosition.Center,
                     bottomBar = {
-                        NavigationBar {
+                        NavigationBar(
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            contentColor = MaterialTheme.colorScheme.onSurface
+                        ) {
                             NavigationBarItem(
                                 selected = currentRoute == "form",
                                 onClick = {
@@ -87,20 +90,20 @@ class MainActivity : ComponentActivity() {
                                         launchSingleTop = true
                                     }
                                 },
-                                icon = { Icon(Icons.Filled.Edit, contentDescription = "Diary") },
+                                icon = { Icon(Icons.Filled.Edit, contentDescription = "Tulis Diary") },
                                 label = { Text("Diary") },
                                 alwaysShowLabel = true
                             )
                             NavigationBarItem(
-                                selected = currentRoute == "analysis",
+                                selected = currentRoute == "history",
                                 onClick = {
-                                    navController.navigate("analysis") {
+                                    navController.navigate("history") {
                                         popUpTo(navController.graph.startDestinationId) { inclusive = false }
                                         launchSingleTop = true
                                     }
                                 },
-                                icon = { Icon(Icons.Filled.Insights, contentDescription = "Analysis") },
-                                label = { Text("Analysis") },
+                                icon = { Icon(Icons.Filled.Insights, contentDescription = "Riwayat & Analisis") },
+                                label = { Text("Riwayat") },
                                 alwaysShowLabel = true
                             )
                             NavigationBarItem(
@@ -111,8 +114,8 @@ class MainActivity : ComponentActivity() {
                                         launchSingleTop = true
                                     }
                                 },
-                                icon = { Icon(Icons.AutoMirrored.Filled.Article, contentDescription = "Content") },
-                                label = { Text("Content") },
+                                icon = { Icon(Icons.AutoMirrored.Filled.Article, contentDescription = "Konten Edukatif") },
+                                label = { Text("Konten") },
                                 alwaysShowLabel = true
                             )
 
@@ -124,11 +127,10 @@ class MainActivity : ComponentActivity() {
                                         launchSingleTop = true
                                     }
                                 },
-                                icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
-                                label = { Text("Settings") },
+                                icon = { Icon(Icons.Default.Settings, contentDescription = "Pengaturan") },
+                                label = { Text("Pengaturan") },
                                 alwaysShowLabel = true
                             )
-
                         }
                     }
                 ) { innerPadding ->
