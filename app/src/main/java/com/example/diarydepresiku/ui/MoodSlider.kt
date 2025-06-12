@@ -13,6 +13,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import kotlin.math.roundToInt
@@ -26,6 +28,8 @@ fun MoodSlider(
     val emojis = listOf("😊", "😟", "😢", "😡")
     val moodNames = listOf("Senang", "Cemas", "Sedih", "Marah")
     var sliderPosition by remember { mutableFloatStateOf(moodNames.indexOf(selectedMood).coerceAtLeast(0).toFloat()) }
+
+    val haptic = LocalHapticFeedback.current
 
     LaunchedEffect(selectedMood) {
         sliderPosition = moodNames.indexOf(selectedMood).coerceAtLeast(0).toFloat()
@@ -56,6 +60,7 @@ fun MoodSlider(
                 sliderPosition = it
                 val idx = it.roundToInt().coerceIn(emojis.indices)
                 onMoodChange(moodNames[idx])
+                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
             },
             valueRange = 0f..(emojis.size - 1).toFloat(),
             steps = emojis.size - 2

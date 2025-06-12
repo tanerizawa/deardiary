@@ -22,6 +22,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext // Diperlukan untuk Preview ViewModel
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
@@ -61,6 +63,8 @@ fun DiaryFormScreen(
     var diaryText by remember { mutableStateOf("") }
     var selectedMood by remember { mutableStateOf(moodOptions[0]) }
     val selectedActivities = remember { mutableStateListOf<String>() }
+
+    val haptic = LocalHapticFeedback.current
 
     val diaryEntries by viewModel.diaryEntries.collectAsState()
     val statusMessage by viewModel.statusMessage.collectAsState()
@@ -139,6 +143,7 @@ fun DiaryFormScreen(
         Button(
             onClick = {
                 if (diaryText.isNotBlank()) {
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                     viewModel.saveEntry(diaryText, selectedMood, selectedActivities.toList())
                     diaryText = ""
                     selectedMood = moodOptions[0]
