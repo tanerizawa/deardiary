@@ -47,6 +47,9 @@ import com.example.diarydepresiku.ui.MoodSlider
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.compose.runtime.LaunchedEffect
+import com.example.diarydepresiku.ContentViewModelFactory
+
 
 // Daftar pilihan mood yang tersedia - Pindahkan di sini atau di file tersendiri
 val moodOptions = listOf("Senang", "Cemas", "Sedih", "Marah")
