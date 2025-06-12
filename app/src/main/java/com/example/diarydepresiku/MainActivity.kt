@@ -22,12 +22,12 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.automirrored.filled.Article // ✅ Gunakan versi AutoMirrored
 
 import com.example.diarydepresiku.ui.theme.DiarydepresikuTheme
-import com.example.diarydepresiku.ui.DiaryFormScreen
-import com.example.diarydepresiku.ui.MoodAnalysisScreen
-import com.example.diarydepresiku.ui.EducationalContentScreen
+import com.example.diarydepresiku.ui.screens.DiaryFormScreen
+import com.example.diarydepresiku.ui.screens.HistoryScreen
+import com.example.diarydepresiku.ui.screens.ContentScreen
+import com.example.diarydepresiku.ui.screens.SettingsScreen
 import com.example.diarydepresiku.ContentViewModel
 import com.example.diarydepresiku.ContentViewModelFactory
-import com.example.diarydepresiku.ui.ReminderSettingsScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
