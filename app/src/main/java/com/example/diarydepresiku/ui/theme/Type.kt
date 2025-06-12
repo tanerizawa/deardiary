@@ -2,30 +2,33 @@ package com.example.diarydepresiku.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.googlefonts.GoogleFont
-import androidx.compose.ui.text.googlefonts.Font
-import com.example.diarydepresiku.R
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.text.ExperimentalTextApi // <<< Pastikan import ini ada!
+// Hapus ExperimentalTextApi jika tidak lagi menggunakan googleFont atau fitur eksperimental teks lainnya
+// Jika Anda tidak menggunakan fitur teks eksperimental lain, Anda bisa menghapus @OptIn(ExperimentalTextApi::class)
+// Tapi jika ada bagian lain yang memerlukan, biarkan saja.
+// Biasanya dengan font lokal, anotasi ini tidak lagi diperlukan kecuali ada fitur TextStyle yang memakainya.
 
-@OptIn(ExperimentalTextApi::class) // <<< Anotasi ini di AppFontFamily
-private val fontProvider = GoogleFont.Provider(
-    providerAuthority = "com.google.android.gms.fonts",
-    providerPackage = "com.google.android.gms",
-    certificates = R.array.com_google_android_gms_fonts_certs
-)
+import com.example.diarydepresiku.R // Pastikan import R ini ada dan benar!
 
+// Tidak perlu @OptIn(ExperimentalTextApi::class) lagi di sini jika hanya menggunakan Font(R.font.xxx)
 val AppFontFamily = FontFamily(
-    Font(GoogleFont("Roboto"), fontProvider, FontWeight.Normal),
-    Font(GoogleFont("Roboto"), fontProvider, FontWeight.Medium),
-    Font(GoogleFont("Roboto"), fontProvider, FontWeight.SemiBold),
-    Font(GoogleFont("Roboto"), fontProvider, FontWeight.Bold)
+    // Asumsikan Anda sudah mengunduh dan menamai file-file font seperti ini:
+    // app/src/main/res/font/roboto_regular.ttf
+    // app/src/main/res/font/roboto_medium.ttf
+    // app/src/main/res/font/roboto_semibold.ttf (jika ada, atau gunakan bold)
+    // app/src/main/res/font/roboto_bold.ttf
+
+    Font(R.font.roboto_regular, FontWeight.Normal),
+    Font(R.font.roboto_medium, FontWeight.Medium),
+    Font(R.font.roboto_semibold, FontWeight.SemiBold), // Sesuaikan jika tidak ada semibold
+    Font(R.font.roboto_bold, FontWeight.Bold)
 )
 
-
-@OptIn(ExperimentalTextApi::class) // <<< Anotasi ini juga di Typography
+// Bagian Typography tetap sama, karena ia hanya mereferensikan AppFontFamily
+// @OptIn(ExperimentalTextApi::class) // Hapus ini juga jika tidak ada TextStyle yang membutuhkannya
 val Typography = Typography(
     displayLarge = TextStyle(
         fontFamily = AppFontFamily,
