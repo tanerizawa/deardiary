@@ -157,10 +157,15 @@ fun DiaryFormScreenPreview() {
     // atau memberikan perilaku yang diharapkan untuk operasi database/jaringan.
     // Untuk preview yang lebih robust, pertimbangkan untuk menginject mock ViewModel.
 
-    val application = LocalContext.current.applicationContext as MyApplication
-    val factory = DiaryViewModelFactory(application = application)
-
-    DiarydepresikuTheme {
-        DiaryFormScreen(viewModel = viewModel(factory = factory))
+    val context = LocalContext.current.applicationContext
+    if (context is MyApplication) {
+        val factory = DiaryViewModelFactory(application = context)
+        DiarydepresikuTheme {
+            DiaryFormScreen(viewModel = viewModel(factory = factory))
+        }
+    } else {
+        DiarydepresikuTheme {
+            androidx.compose.material3.Text("Preview unavailable")
+        }
     }
 }
