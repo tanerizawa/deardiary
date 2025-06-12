@@ -22,7 +22,7 @@ import androidx.compose.material.icons.filled.Person
 
 import com.example.diarydepresiku.ui.theme.DiarydepresikuTheme
 import com.example.diarydepresiku.ui.DiaryFormScreen
-import com.example.diarydepresiku.ui.MoodAnalysisScreen
+import com.example.diarydepresiku.ui.HomeScreen
 import com.example.diarydepresiku.ui.EducationalContentScreen
 import com.example.diarydepresiku.ui.HistoryScreen
 import com.example.diarydepresiku.ui.ProfileScreen
@@ -136,9 +136,9 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable("home") {
-                            MoodAnalysisScreen(
-                                viewModel = diaryViewModel,
-                                onNavigateToContent = { navController.navigate("content") }
+                            HomeScreen(
+                                diaryViewModel = diaryViewModel,
+                                contentViewModel = contentViewModel
                             )
                         }
                         composable("history") {
