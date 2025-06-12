@@ -10,6 +10,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import com.example.diarydepresiku.content.NewsApiService
 import com.example.diarydepresiku.content.EducationalArticleDao
 import com.example.diarydepresiku.content.ContentRepository
+import com.example.diarydepresiku.content.ArticleReactionDao
 import com.example.diarydepresiku.BuildConfig
 import com.example.diarydepresiku.AchievementDao
 
@@ -31,6 +32,10 @@ class MyApplication : Application() {
 
     val achievementDao: AchievementDao by lazy {
         database.achievementDao()
+    }
+
+    val reactionDao: ArticleReactionDao by lazy {
+        database.articleReactionDao()
     }
 
     // Lazy initialization untuk Retrofit
@@ -63,7 +68,7 @@ class MyApplication : Application() {
     }
 
     val contentRepository: ContentRepository by lazy {
-        ContentRepository(newsApi, articleDao, this)
+        ContentRepository(newsApi, articleDao, reactionDao, this)
     }
 
     val reminderPreferences: ReminderPreferences by lazy {

@@ -6,12 +6,15 @@ import android.net.NetworkCapabilities
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.example.diarydepresiku.R
+import com.example.diarydepresiku.content.ArticleReaction
+import com.example.diarydepresiku.content.ArticleReactionDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 open class ContentRepository(
     private val api: NewsApiService,
     private val dao: EducationalArticleDao,
+    private val reactionDao: ArticleReactionDao,
     private val context: Context
 ) {
     private fun isNetworkAvailable(): Boolean {
@@ -48,6 +51,11 @@ open class ContentRepository(
             if (cached.isNotEmpty()) return@withContext cached
             return@withContext loadDefaultArticles()
         }
+
+    suspend fun recordReaction(url: String, reaction: String) {
+        val entity = ArticleReaction(articleUrl = url, reaction = reaction)
+        withContext(Dispatchers.IO) { reactionDao.insertReaction(entity) }
+    }
 
     private fun loadDefaultArticles(): List<EducationalArticle> {
         val input = context.resources.openRawResource(R.raw.default_articles)

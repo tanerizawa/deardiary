@@ -56,5 +56,9 @@ class ContentViewModel(
             _highlightMood.value = mood
         }
     }
+
+    fun recordReaction(url: String, reaction: String) {
+        viewModelScope.launch { repository.recordReaction(url, reaction) }
+    }
 }
 
