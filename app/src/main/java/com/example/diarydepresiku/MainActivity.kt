@@ -67,16 +67,17 @@ class MainActivity : ComponentActivity() {
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     floatingActionButton = {
-                        FloatingActionButton(
+                        AnimatedFab(
                             onClick = {
                                 navController.navigate("form") {
                                     popUpTo(navController.graph.startDestinationId) { inclusive = false }
                                     launchSingleTop = true
                                 }
-                            }
-                        ) {
-                            Icon(Icons.Filled.Edit, contentDescription = "New Entry")
-                        }
+                            },
+                            isExpanded = currentRoute != "form",
+                            icon = Icons.Filled.Edit,
+                            text = "Tulis Diary"
+                        )
                     },
                     floatingActionButtonPosition = FabPosition.Center,
                     bottomBar = {
