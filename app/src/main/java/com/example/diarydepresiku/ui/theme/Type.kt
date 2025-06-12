@@ -29,7 +29,7 @@ val AppFontFamily = FontFamily(
 
 // Bagian Typography tetap sama, karena ia hanya mereferensikan AppFontFamily
 // @OptIn(ExperimentalTextApi::class) // Hapus ini juga jika tidak ada TextStyle yang membutuhkannya
-val Typography = Typography(
+val AppTypography = Typography(
     displayLarge = TextStyle(
         fontFamily = AppFontFamily,
         fontWeight = FontWeight.Bold,
@@ -61,3 +61,18 @@ val Typography = Typography(
         fontSize = 14.sp
     )
 )
+
+fun scaledTypography(scale: Float): Typography {
+    if (scale == 1f) return AppTypography
+
+    fun TextStyle.scale() = copy(fontSize = (fontSize.value * scale).sp)
+
+    return Typography(
+        displayLarge = AppTypography.displayLarge.scale(),
+        titleLarge = AppTypography.titleLarge.scale(),
+        titleMedium = AppTypography.titleMedium.scale(),
+        bodyLarge = AppTypography.bodyLarge.scale(),
+        bodyMedium = AppTypography.bodyMedium.scale(),
+        labelLarge = AppTypography.labelLarge.scale()
+    )
+}

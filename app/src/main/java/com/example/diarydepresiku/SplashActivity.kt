@@ -23,7 +23,11 @@ class SplashActivity : ComponentActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContent {
-            DiarydepresikuTheme {
+            val application = application as MyApplication
+            val darkMode by application.reminderPreferences.darkMode.collectAsState(initial = false)
+            val fontScale by application.reminderPreferences.fontScale.collectAsState(initial = 1f)
+
+            DiarydepresikuTheme(darkTheme = darkMode, fontScale = fontScale) {
                 SplashScreen {
                     startActivity(Intent(this, MainActivity::class.java))
                     finish()

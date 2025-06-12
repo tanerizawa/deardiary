@@ -10,6 +10,7 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import com.example.diarydepresiku.ui.theme.scaledTypography
 
 // Skema warna pastel lembut (diambil dari Color.kt yang telah disesuaikan)
 // Color scheme using the refreshed palette defined in Color.kt
@@ -47,6 +48,7 @@ private val DarkColorScheme = darkColorScheme(
 fun DiarydepresikuTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = true,
+    fontScale: Float = 1f,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
@@ -61,7 +63,7 @@ fun DiarydepresikuTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
+        typography = scaledTypography(fontScale),
         content = content
     )
 }

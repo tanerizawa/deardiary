@@ -59,7 +59,10 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            DiarydepresikuTheme {
+            val darkMode by application.reminderPreferences.darkMode.collectAsState(initial = false)
+            val fontScale by application.reminderPreferences.fontScale.collectAsState(initial = 1f)
+
+            DiarydepresikuTheme(darkTheme = darkMode, fontScale = fontScale) {
                 val navController = rememberNavController()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
