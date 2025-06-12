@@ -1,33 +1,24 @@
 # app/main.py: Aplikasi FastAPI dan endpoint-endpoint API
-from fastapi import (
-    FastAPI,
-    Depends,
-    HTTPException,
-    status,
-)  # Import status dan HTTPException
+from fastapi import FastAPI, Depends, HTTPException, status
 import os
 import requests
 from sqlalchemy.orm import Session
-from typing import List, Dict  # Untuk tipe hint List dan Dict
+from typing import List
 
-from . import crud  # Import modul CRUD lokal
+from . import crud
 from . import models, schemas
 from .database import engine, get_db
 
-# Membuat objek FastAPI
 app = FastAPI(
-    title="Diary Depresiku API",  # Judul aplikasi di Swagger UI
+    title="Diary Depresiku API",
     description="API untuk menyimpan dan mengelola entri diary, serta fitur analisis mood.",
     version="0.1.0",
 )
 
-# Membuat semua tabel di database (jika belum ada)
-# Ini harus dipanggil sekali saat aplikasi startup
 models.Base.metadata.create_all(bind=engine)
 
 
 def analyze_with_gemini(text: str) -> str:
-    """Send text to Gemini API and return mood description."""
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
         raise RuntimeError("Missing GEMINI_API_KEY")
@@ -41,24 +32,27 @@ def analyze_with_gemini(text: str) -> str:
                 "parts": [
                     {
                         "text": (
-                            "Analisis mood untuk teks berikut secara singkat. "
-                            "Balas hanya dengan kata Positif, Negatif, atau Netral.\n"
-                            + text
+                                "Analisis mood untuk teks berikut secara singkat. "
+                                "Balas hanya dengan kata Positif, Negatif, atau Netral.\n"
+                                + text
                         )
                     }
                 ]
             }
         ]
     }
-    response = requests.post(url, json=payload, timeout=10)
-    response.raise_for_status()
-    data = response.json()
-    result = data["candidates"][0]["content"]["parts"][0]["text"].lower()
-    if "positif" in result:
-        return "Mood terdeteksi positif"
-    if "negatif" in result:
-        return "Mood terdeteksi negatif"
-    return "Mood netral"
+    try:
+        response = requests.post(url, json=payload, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        result = data["candidates"][0]["content"]["parts"][0]["text"].lower()
+        if "positif" in result:
+            return "Mood terdeteksi positif"
+        if "negatif" in result:
+            return "Mood terdeteksi negatif"
+        return "Mood netral"
+    except Exception as e:
+        raise RuntimeError(f"Error from Gemini API: {e}")
 
 
 @app.post("/register/", status_code=status.HTTP_201_CREATED)
@@ -76,84 +70,39 @@ async def login_user(user: schemas.UserLogin, db: Session = Depends(get_db)):
     return {"token": "dummy"}
 
 
-# Endpoint untuk membuat entri diary baru
-@app.post(
-    "/entries/",  # Menggunakan trailing slash agar konsisten dengan Android
-    response_model=schemas.DiaryEntryResponse,  # Menggunakan schema respons yang benar
-    status_code=status.HTTP_201_CREATED,  # Menggunakan kode status 201 Created
-    summary="Membuat entri diary baru",
-    description="Menyimpan entri diary baru ke database, termasuk isi, mood, dan timestamp.",
-)
-async def create_diary_entry_endpoint(  # Nama fungsi yang lebih deskriptif
-    entry: schemas.DiaryEntryCreate,  # Schema Pydantic untuk request body
-    db: Session = Depends(get_db),  # Dependency injection untuk sesi database
-):
-    # Memanggil fungsi CRUD untuk membuat entri di database
-    # Menggunakan properti 'content' dan 'timestamp' sesuai dengan schemas dan models
-    db_entry = crud.create_diary_entry(db=db, entry=entry)
-    return schemas.DiaryEntryResponse.model_validate(db_entry)
+@app.post("/entries/", response_model=schemas.DiaryEntryResponse, status_code=status.HTTP_201_CREATED)
+async def create_diary_entry_endpoint(entry: schemas.DiaryEntryCreate, db: Session = Depends(get_db)):
+    try:
+        db_entry = crud.create_diary_entry(db=db, entry=entry)
+        return schemas.DiaryEntryResponse.model_validate(db_entry)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to create entry: {str(e)}")
 
 
-# Endpoint untuk mendapatkan semua entri diary
-@app.get(
-    "/entries/",
-    response_model=List[
-        schemas.DiaryEntryResponse
-    ],  # Mengembalikan daftar DiaryEntryResponse
-    summary="Mendapatkan semua entri diary",
-    description="Mengambil daftar semua entri diary yang tersimpan, diurutkan berdasarkan timestamp terbaru.",
-)
-async def read_diary_entries_endpoint(
-    skip: int = 0,  # Parameter query untuk pagination
-    limit: int = 100,  # Parameter query untuk pagination
-    db: Session = Depends(get_db),
-):
+@app.get("/entries/", response_model=List[schemas.DiaryEntryResponse])
+async def read_diary_entries_endpoint(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     entries = crud.get_diary_entries(db=db, skip=skip, limit=limit)
     return [schemas.DiaryEntryResponse.model_validate(e) for e in entries]
 
 
-# Endpoint untuk mendapatkan entri diary berdasarkan ID
-@app.get(
-    "/entries/{entry_id}",  # Endpoint dengan path parameter
-    response_model=schemas.DiaryEntryResponse,
-    summary="Mendapatkan entri diary berdasarkan ID",
-    description="Mengambil satu entri diary berdasarkan ID uniknya.",
-)
-async def read_diary_entry_by_id_endpoint(
-    entry_id: int, db: Session = Depends(get_db)  # Path parameter
-):
+@app.get("/entries/{entry_id}", response_model=schemas.DiaryEntryResponse)
+async def read_diary_entry_by_id_endpoint(entry_id: int, db: Session = Depends(get_db)):
     db_entry = crud.get_diary_entry(db=db, entry_id=entry_id)
     if db_entry is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Entry not found"
-        )
+        raise HTTPException(status_code=404, detail="Entry not found")
     return schemas.DiaryEntryResponse.model_validate(db_entry)
 
 
-# Endpoint untuk analisis AI terhadap teks diary
-@app.post(
-    "/analyze",
-    response_model=schemas.AnalyzeResponse,
-    summary="Menganalisis teks diary",
-    description="Melakukan analisis sederhana terhadap teks diary untuk mendeteksi mood.",
-)
-def analyze_entry_endpoint(  # Nama fungsi yang lebih deskriptif
-    request: schemas.AnalyzeRequest,
-):
+@app.post("/analyze", response_model=schemas.AnalyzeResponse)
+def analyze_entry_endpoint(request: schemas.AnalyzeRequest):
     try:
         analysis_result = analyze_with_gemini(request.text)
-    except Exception:
-        raise HTTPException(status_code=500, detail="Failed to analyze text")
+        return {"analysis": analysis_result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to analyze text: {e}")
 
-    return {"analysis": analysis_result}
 
-
-@app.get(
-    "/stats/",
-    response_model=schemas.MoodStatsResponse,
-    summary="Statistik mood",
-    description="Menghitung jumlah entri untuk tiap mood.",
-)
+@app.get("/stats/", response_model=schemas.MoodStatsResponse)
 async def read_mood_stats_endpoint(db: Session = Depends(get_db)):
     stats = crud.get_mood_stats(db)
     return {"stats": stats}
