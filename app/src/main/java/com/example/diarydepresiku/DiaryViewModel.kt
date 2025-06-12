@@ -13,6 +13,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext // Mungkin tidak langsung terpakai di sini
 import java.util.concurrent.TimeUnit
+import java.time.Instant
+import java.time.ZoneId
+import java.time.LocalDate
 import com.example.diarydepresiku.EntryStatus
 
 /**
@@ -72,12 +75,42 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
             initialValue = emptyMap()
         )
 
+    // Streak harian beruntun
+    val entryStreak: StateFlow<Int> = diaryEntries
+        .map { entries -> computeStreak(entries) }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = 0
+        )
+
+    // Pencapaian yang telah diperoleh
+    val achievements: StateFlow<List<Achievement>> = repository.getAchievements()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
     // Inisialisasi pengambilan statistik mood dari backend
     init {
         viewModelScope.launch {
             val stats = repository.getMoodStats()
             if (stats != null) {
                 _moodCounts.value = stats
+            }
+        }
+
+        // Award badges berdasarkan streak
+        viewModelScope.launch {
+            entryStreak.collect { streak ->
+                if (streak >= 30 && achievements.value.none { it.name == "30 Day Streak" }) {
+                    repository.addAchievement("30 Day Streak")
+                } else if (streak >= 7 && achievements.value.none { it.name == "7 Day Streak" }) {
+                    repository.addAchievement("7 Day Streak")
+                } else if (streak >= 3 && achievements.value.none { it.name == "3 Day Streak" }) {
+                    repository.addAchievement("3 Day Streak")
+                }
             }
         }
     }
@@ -148,6 +181,32 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
                 .take(5)
                 .map { it.key }
         }
+    }
+
+    /** Hitung streak harian berturut-turut */
+    private fun computeStreak(entries: List<DiaryEntry>): Int {
+        if (entries.isEmpty()) return 0
+        val sorted = entries.sortedByDescending { it.creationTimestamp }
+        var streak = 0
+        var lastDay: LocalDate? = null
+        for (entry in sorted) {
+            val day = Instant.ofEpochMilli(entry.creationTimestamp)
+                .atZone(ZoneId.systemDefault()).toLocalDate()
+            if (lastDay == null) {
+                streak = 1
+                lastDay = day
+                continue
+            }
+            val diff = lastDay!!.toEpochDay() - day.toEpochDay()
+            if (diff == 0L) continue
+            if (diff == 1L) {
+                streak++
+                lastDay = day
+            } else {
+                break
+            }
+        }
+        return streak
     }
 
     // TODO: Tambahkan fungsi lain untuk operasi CRUD (update, delete, getById) jika diperlukan

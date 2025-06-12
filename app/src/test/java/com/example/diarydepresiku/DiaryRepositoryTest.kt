@@ -20,6 +20,12 @@ class FakeDiaryDao : DiaryDao {
     override fun getAllEntries(): Flow<List<DiaryEntry>> = flowOf(entries)
 }
 
+class FakeAchievementDao : AchievementDao {
+    val achievements = mutableListOf<Achievement>()
+    override fun getAllAchievements(): Flow<List<Achievement>> = flowOf(achievements)
+    override suspend fun insertAchievement(achievement: Achievement) { achievements.add(achievement) }
+}
+
 class FakeDiaryApi : DiaryApi {
     var posted: DiaryEntryRequest? = null
     override suspend fun postEntry(entry: DiaryEntryRequest): Response<DiaryEntryResponse> {
@@ -46,7 +52,7 @@ class DiaryRepositoryTest {
     fun addEntry_savesLocallyAndCallsApi() = runBlocking {
         val dao = FakeDiaryDao()
         val api = FakeDiaryApi()
-        val repository = DiaryRepository(dao, api)
+        val repository = DiaryRepository(dao, api, FakeAchievementDao())
 
         val status = repository.addEntry("Hello", "Senang")
 
@@ -60,7 +66,7 @@ class DiaryRepositoryTest {
     fun addEntry_returnsOfflineOnFailure() = runBlocking {
         val dao = FakeDiaryDao()
         val api = FailingDiaryApi()
-        val repository = DiaryRepository(dao, api)
+        val repository = DiaryRepository(dao, api, FakeAchievementDao())
 
         val status = repository.addEntry("Hi", "Sedih")
 
@@ -70,7 +76,7 @@ class DiaryRepositoryTest {
 
     @Test
     fun getMoodStats_returnsApiData() = runBlocking {
-        val repository = DiaryRepository(FakeDiaryDao(), FakeDiaryApi())
+        val repository = DiaryRepository(FakeDiaryDao(), FakeDiaryApi(), FakeAchievementDao())
 
         val stats = repository.getMoodStats()
 

@@ -11,6 +11,7 @@ import com.example.diarydepresiku.content.NewsApiService
 import com.example.diarydepresiku.content.EducationalArticleDao
 import com.example.diarydepresiku.content.ContentRepository
 import com.example.diarydepresiku.BuildConfig
+import com.example.diarydepresiku.AchievementDao
 
 class MyApplication : Application() {
 
@@ -26,6 +27,10 @@ class MyApplication : Application() {
 
     val articleDao: EducationalArticleDao by lazy {
         database.educationalArticleDao()
+    }
+
+    val achievementDao: AchievementDao by lazy {
+        database.achievementDao()
     }
 
     // Lazy initialization untuk Retrofit
@@ -54,7 +59,7 @@ class MyApplication : Application() {
 
     // Lazy initialization untuk Repository (menerima DAO dan API)
     val diaryRepository: DiaryRepository by lazy {
-        DiaryRepository(diaryDao, diaryApi)
+        DiaryRepository(diaryDao, diaryApi, achievementDao)
     }
 
     val contentRepository: ContentRepository by lazy {
