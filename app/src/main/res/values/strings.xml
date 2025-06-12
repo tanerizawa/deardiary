@@ -1,3 +1,61 @@
 <resources>
-    <string name="app_name">diarydepresiku</string>
+    <string name="app_name">Diary Depresiku</string>
+
+    <!-- Navigation -->
+    <string name="nav_diary">Diary</string>
+    <string name="nav_history">Riwayat</string>
+    <string name="nav_analysis">Analisis</string>
+    <string name="nav_content">Konten</string>
+    <string name="nav_settings">Pengaturan</string>
+
+    <!-- Diary Form -->
+    <string name="diary_title">Bagaimana perasaan Anda hari ini?</string>
+    <string name="diary_content_hint">Ceritakan tentang hari Anda, perasaan, atau apapun yang ingin Anda ungkapkan...</string>
+    <string name="diary_mood_label">Pilih mood Anda:</string>
+    <string name="diary_save">Simpan Catatan</string>
+    <string name="diary_saved">Catatan tersimpan!</string>
+
+    <!-- Moods -->
+    <string name="mood_very_happy">Sangat Bahagia</string>
+    <string name="mood_happy">Bahagia</string>
+    <string name="mood_neutral">Netral</string>
+    <string name="mood_sad">Sedih</string>
+    <string name="mood_very_sad">Sangat Sedih</string>
+
+    <!-- Analysis -->
+    <string name="analysis_title">Analisis Mood</string>
+    <string name="analysis_subtitle">Perkembangan mood Anda minggu ini</string>
+    <string name="analysis_no_data">Belum ada data untuk dianalisis. Mulai menulis diary Anda!</string>
+
+    <!-- Content -->
+    <string name="content_title">Konten Edukatif</string>
+    <string name="content_subtitle">Artikel dan tips untuk kesehatan mental</string>
+    <string name="content_loading">Memuat konten...</string>
+    <string name="content_error">Gagal memuat konten</string>
+    <string name="content_retry">Coba Lagi</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Pengaturan</string>
+    <string name="settings_reminders">Pengingat Harian</string>
+    <string name="settings_reminder_time">Waktu Pengingat</string>
+    <string name="settings_notifications">Notifikasi</string>
+    <string name="settings_privacy">Privasi</string>
+    <string name="settings_about">Tentang Aplikasi</string>
+
+    <!-- Common -->
+    <string name="ok">OK</string>
+    <string name="cancel">Batal</string>
+    <string name="save">Simpan</string>
+    <string name="delete">Hapus</string>
+    <string name="edit">Edit</string>
+    <string name="loading">Memuat...</string>
+    <string name="error">Terjadi kesalahan</string>
+    <string name="retry">Coba Lagi</string>
+    <string name="no_data">Tidak ada data</string>
+
+    <!-- Accessibility -->
+    <string name="cd_mood_button">Pilih mood %1$s</string>
+    <string name="cd_new_entry">Tulis catatan baru</string>
+    <string name="cd_back">Kembali</string>
+    <string name="cd_menu">Menu</string>
 </resources>
