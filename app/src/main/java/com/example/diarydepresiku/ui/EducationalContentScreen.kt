@@ -25,6 +25,14 @@ fun EducationalContentScreen(
     viewModel: ContentViewModel,
     modifier: Modifier = Modifier
 ) {
+    ArticleList(viewModel = viewModel, modifier = modifier)
+}
+
+@Composable
+fun ArticleList(
+    viewModel: ContentViewModel,
+    modifier: Modifier = Modifier
+) {
     val articles = viewModel.articles.collectAsState().value
     val highlightMood = viewModel.highlightMood.collectAsState().value
     val context = LocalContext.current
@@ -61,7 +69,7 @@ fun EducationalContentScreen(
 }
 
 @Composable
-private fun ArticleItem(
+fun ArticleItem(
     article: EducationalArticle,
     isHighlighted: Boolean,
     showReactions: Boolean,
