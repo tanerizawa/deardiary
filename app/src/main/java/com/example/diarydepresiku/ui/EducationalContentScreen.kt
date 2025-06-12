@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,7 +13,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -27,6 +28,7 @@ fun EducationalContentScreen(
     val articles = viewModel.articles.collectAsState().value
     val highlightMood = viewModel.highlightMood.collectAsState().value
     val context = LocalContext.current
+    var openedUrl by remember { mutableStateOf<String?>(null) }
 
     LazyColumn(
         modifier = modifier
@@ -38,12 +40,22 @@ fun EducationalContentScreen(
                 article.title?.contains(highlightMood, ignoreCase = true) == true ||
                     article.description?.contains(highlightMood, ignoreCase = true) == true
             )
-            ArticleItem(article = article, isHighlighted = highlighted) { url ->
-                url?.let {
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(it))
-                    context.startActivity(intent)
+            ArticleItem(
+                article = article,
+                isHighlighted = highlighted,
+                showReactions = openedUrl == article.url,
+                onOpen = { url ->
+                    url?.let {
+                        openedUrl = it
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(it))
+                        context.startActivity(intent)
+                    }
+                },
+                onReaction = { emoji ->
+                    openedUrl?.let { viewModel.recordReaction(it, emoji) }
+                    openedUrl = null
                 }
-            }
+            )
         }
     }
 }
@@ -52,7 +64,9 @@ fun EducationalContentScreen(
 private fun ArticleItem(
     article: EducationalArticle,
     isHighlighted: Boolean,
-    onOpen: (String?) -> Unit
+    showReactions: Boolean,
+    onOpen: (String?) -> Unit,
+    onReaction: (String) -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -70,6 +84,18 @@ private fun ArticleItem(
             Text(text = article.title.orEmpty(), style = MaterialTheme.typography.titleMedium)
             article.description?.let {
                 Text(text = it, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(top = 4.dp))
+            }
+            if (showReactions) {
+                Row(modifier = Modifier.padding(top = 8.dp)) {
+                    listOf("👍", "😊", "😢", "😡", "😮").forEach { emoji ->
+                        Text(
+                            text = emoji,
+                            modifier = Modifier
+                                .padding(end = 8.dp)
+                                .clickable { onReaction(emoji) }
+                        )
+                    }
+                }
             }
         }
     }
