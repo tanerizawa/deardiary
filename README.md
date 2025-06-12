@@ -137,6 +137,19 @@ buildTypes {
 
 Gunakan `BuildConfig.BASE_URL` di kode Kotlin untuk memperoleh URL yang sesuai
 dengan jenis build.
+
+### Kunci API
+
+Simpan kunci API eksternal di file `local.properties` pada direktori proyek.
+Tambahkan entri berikut:
+
+```properties
+NEWS_API_KEY=your-news-api-key
+GEMINI_API_KEY=your-gemini-api-key
+```
+
+File `local.properties` sudah ada di `.gitignore`, sehingga kunci rahasia tidak
+terikut saat commit.
 ## Kontribusi
 Kami menyambut kontribusi dari komunitas. Silakan fork repositori ini, buat branch baru, dan kirim pull request. Pedoman kontribusi tersedia di CONTRIBUTING.md.
 
@@ -148,3 +161,4 @@ Pengembang utama:
 dr. Tan
 Email: tanerizawa(at)gmail.com
 GitHub: https://github.com/tanerizawa
+

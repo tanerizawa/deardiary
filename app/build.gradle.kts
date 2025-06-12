@@ -1,11 +1,23 @@
 // app/build.gradle.kts
 
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp) // <<< GUNAKAN ALIAS INI jika sudah didefinisikan di libs.versions.toml
 }
+
+val localProps = Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.exists()) {
+        load(file.inputStream())
+    }
+}
+
+fun secret(key: String): String? =
+    localProps.getProperty(key) ?: project.findProperty(key) as String?
 
 android {
     namespace = "com.example.diarydepresiku"
@@ -20,8 +32,9 @@ android {
 
         // Base URL for backend API
         buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8000/\"")
-        // API key for fetching articles from NewsAPI
-        buildConfigField("String", "NEWS_API_KEY", "\"211a92aa3ca141c1b1c3a410235d80d7\"")
+        // API keys loaded from local.properties or Gradle properties
+        buildConfigField("String", "NEWS_API_KEY", "\"${secret("NEWS_API_KEY") ?: ""}\"")
+        buildConfigField("String", "GEMINI_API_KEY", "\"${secret("GEMINI_API_KEY") ?: ""}\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
