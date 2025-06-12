@@ -9,7 +9,8 @@ import kotlinx.coroutines.flow.Flow
 // Menerima DAO dan API service sebagai parameter constructor (praktik terbaik)
 class DiaryRepository(
     private val diaryDao: DiaryDao,
-    private val diaryApi: DiaryApi // API service disuntikkan
+    private val diaryApi: DiaryApi, // API service disuntikkan
+    private val achievementDao: AchievementDao
 ) {
 
     suspend fun addEntry(content: String, mood: String): EntryStatus {
@@ -61,6 +62,13 @@ class DiaryRepository(
      */
     fun getAllEntries(): Flow<List<DiaryEntry>> { // <<< KOREKSI NAMA FUNGSI INI
         return diaryDao.getAllEntries()
+    }
+
+    fun getAchievements(): Flow<List<Achievement>> = achievementDao.getAllAchievements()
+
+    suspend fun addAchievement(name: String) {
+        val achievement = Achievement(name = name, earnedTimestamp = System.currentTimeMillis())
+        withContext(Dispatchers.IO) { achievementDao.insertAchievement(achievement) }
     }
 
     /**

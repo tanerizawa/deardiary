@@ -18,8 +18,8 @@ import com.example.diarydepresiku.content.EducationalArticleEntity
  * @param typeConverters Mendaftarkan kelas TypeConverter untuk tipe data kustom.
  */
 @Database(
-    entities = [DiaryEntry::class, EducationalArticleEntity::class],
-    version = 2,
+    entities = [DiaryEntry::class, EducationalArticleEntity::class, Achievement::class],
+    version = 3,
     exportSchema = false
 )
 @TypeConverters(Converters::class) // **PENTING: Daftarkan kelas TypeConverter di sini**
@@ -30,6 +30,9 @@ abstract class DiaryDatabase : RoomDatabase() {
 
     // DAO untuk artikel edukasi yang disimpan secara lokal
     abstract fun educationalArticleDao(): com.example.diarydepresiku.content.EducationalArticleDao
+
+    // DAO untuk pencapaian pengguna
+    abstract fun achievementDao(): AchievementDao
 
     companion object {
         @Volatile // Memastikan variabel ini selalu up-to-date di semua thread

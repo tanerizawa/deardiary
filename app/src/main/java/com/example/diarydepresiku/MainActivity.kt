@@ -157,7 +157,7 @@ class MainActivity : ComponentActivity() {
                             HistoryScreen(viewModel = diaryViewModel)
                         }
                         composable("profile") {
-                            ProfileScreen()
+                            ProfileScreen(viewModel = diaryViewModel)
                         }
                         composable("content") {
                             EducationalContentScreen(viewModel = contentViewModel)
