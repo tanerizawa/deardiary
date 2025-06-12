@@ -73,16 +73,40 @@ function startFastAPI() {
 
   uvicornProcess.on("error", (error) => {
     console.error("Failed to start FastAPI server:", error.message);
-    console.log("\nTo fix this issue:");
-    console.log("1. Install pip: apt install python3-pip (on Ubuntu/Debian)");
-    console.log(
-      "2. Install dependencies: cd app/backend_api && pip install -r requirements.txt",
-    );
-    console.log(
-      "3. Or install manually: pip install fastapi uvicorn sqlalchemy pydantic",
-    );
-    console.log("\nAlternatively, use Docker or a Python virtual environment.");
-    process.exit(1);
+    console.log("\n🔄 Falling back to Node.js mock server...");
+    console.log("Starting development mock server instead...\n");
+
+    // Start the mock server as fallback
+    const mockServer = spawn("node", ["mock-server.js"], {
+      stdio: "inherit",
+      cwd: __dirname,
+    });
+
+    mockServer.on("error", (mockError) => {
+      console.error("Failed to start mock server:", mockError.message);
+      console.log("\nTo fix this issue:");
+      console.log("1. Install pip: apt install python3-pip (on Ubuntu/Debian)");
+      console.log(
+        "2. Install dependencies: cd app/backend_api && pip install -r requirements.txt",
+      );
+      console.log(
+        "3. Or install manually: pip install fastapi uvicorn sqlalchemy pydantic",
+      );
+      process.exit(1);
+    });
+
+    // Handle graceful shutdown for mock server
+    process.on("SIGINT", () => {
+      console.log("Shutting down mock server...");
+      mockServer.kill("SIGINT");
+      process.exit(0);
+    });
+
+    process.on("SIGTERM", () => {
+      console.log("Shutting down mock server...");
+      mockServer.kill("SIGTERM");
+      process.exit(0);
+    });
   });
 
   uvicornProcess.on("close", (code) => {
