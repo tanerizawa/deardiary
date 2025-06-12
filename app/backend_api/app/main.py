@@ -5,6 +5,8 @@ from fastapi import (
     HTTPException,
     status,
 )  # Import status dan HTTPException
+import os
+import requests
 from sqlalchemy.orm import Session
 from typing import List, Dict  # Untuk tipe hint List dan Dict
 
@@ -22,6 +24,41 @@ app = FastAPI(
 # Membuat semua tabel di database (jika belum ada)
 # Ini harus dipanggil sekali saat aplikasi startup
 models.Base.metadata.create_all(bind=engine)
+
+
+def analyze_with_gemini(text: str) -> str:
+    """Send text to Gemini API and return mood description."""
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        raise RuntimeError("Missing GEMINI_API_KEY")
+    url = (
+        "https://generativelanguage.googleapis.com/v1beta/models/"
+        f"gemini-pro:generateContent?key={api_key}"
+    )
+    payload = {
+        "contents": [
+            {
+                "parts": [
+                    {
+                        "text": (
+                            "Analisis mood untuk teks berikut secara singkat. "
+                            "Balas hanya dengan kata Positif, Negatif, atau Netral.\n"
+                            + text
+                        )
+                    }
+                ]
+            }
+        ]
+    }
+    response = requests.post(url, json=payload, timeout=10)
+    response.raise_for_status()
+    data = response.json()
+    result = data["candidates"][0]["content"]["parts"][0]["text"].lower()
+    if "positif" in result:
+        return "Mood terdeteksi positif"
+    if "negatif" in result:
+        return "Mood terdeteksi negatif"
+    return "Mood netral"
 
 
 @app.post("/register/", status_code=status.HTTP_201_CREATED)
@@ -103,21 +140,11 @@ async def read_diary_entry_by_id_endpoint(
 def analyze_entry_endpoint(  # Nama fungsi yang lebih deskriptif
     request: schemas.AnalyzeRequest,
 ):
-    text = request.text
-    # Logika dummy: menentukan analisis berdasar kemunculan kata (hanya contoh placeholder)
-    analysis_result = "Mood netral"
-    if any(
-        word in text.lower()
-        for word in ["sedih", "marah", "cemas", "depresi", "frustasi"]
-    ):
-        analysis_result = "Mood terdeteksi negatif"
-    elif any(
-        word in text.lower()
-        for word in ["senang", "bahagia", "gembira", "ceria", "optimis"]
-    ):
-        analysis_result = "Mood terdeteksi positif"
+    try:
+        analysis_result = analyze_with_gemini(request.text)
+    except Exception:
+        raise HTTPException(status_code=500, detail="Failed to analyze text")
 
-    # Mengembalikan hasil analisis dummy
     return {"analysis": analysis_result}
 
 

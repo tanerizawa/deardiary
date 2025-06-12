@@ -1,5 +1,6 @@
 import sys
 from fastapi.testclient import TestClient
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
@@ -68,3 +69,18 @@ def test_mood_stats(client):
     resp = client.get("/stats/")
     assert resp.status_code == 200
     assert resp.json()["stats"] == {"Sedih": 2}
+
+
+def test_analyze_entry(client, monkeypatch):
+    class MockResp:
+        def raise_for_status(self):
+            pass
+
+        def json(self):
+            return {"candidates": [{"content": {"parts": [{"text": "Positif"}]}}]}
+
+    monkeypatch.setenv("GEMINI_API_KEY", "dummy")
+    monkeypatch.setattr("app.main.requests.post", lambda *a, **k: MockResp())
+    resp = client.post("/analyze", json={"text": "saya senang"})
+    assert resp.status_code == 200
+    assert resp.json()["analysis"] == "Mood terdeteksi positif"
