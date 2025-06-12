@@ -2,6 +2,9 @@ package com.example.diarydepresiku
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.first
+import java.time.LocalDate
+import java.time.ZoneId
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -18,6 +21,8 @@ class FakeDiaryDao : DiaryDao {
     override suspend fun deleteEntry(entry: DiaryEntry) { entries.remove(entry) }
     override suspend fun getEntryById(id: Int): DiaryEntry? = entries.find { it.id == id }
     override fun getAllEntries(): Flow<List<DiaryEntry>> = flowOf(entries)
+    override fun getEntriesInRange(start: Long, end: Long): Flow<List<DiaryEntry>> =
+        flowOf(entries.filter { it.creationTimestamp in start..end })
 }
 
 class FakeAchievementDao : AchievementDao {
@@ -82,5 +87,26 @@ class DiaryRepositoryTest {
         val stats = repository.getMoodStats()
 
         assertEquals(mapOf("Senang" to 1), stats)
+    }
+
+    @Test
+    fun getEntriesForDay_filtersByTimestamp() = runBlocking {
+        val dao = FakeDiaryDao()
+        val api = FakeDiaryApi()
+        val repository = DiaryRepository(dao, api, FakeAchievementDao())
+
+        val today = LocalDate.now()
+        val zone = ZoneId.systemDefault()
+        dao.entries.add(
+            DiaryEntry(1, "A", "Senang", emptyList(), today.atStartOfDay(zone).toInstant().toEpochMilli())
+        )
+        dao.entries.add(
+            DiaryEntry(2, "B", "Sedih", emptyList(), today.minusDays(1).atStartOfDay(zone).toInstant().toEpochMilli())
+        )
+
+        val result = repository.getEntriesForDay(today)
+
+        assertEquals(1, result.first().size)
+        assertEquals("A", result.first()[0].content)
     }
 }

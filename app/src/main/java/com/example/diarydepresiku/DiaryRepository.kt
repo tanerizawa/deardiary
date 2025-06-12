@@ -3,6 +3,8 @@ package com.example.diarydepresiku
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.Flow
+import java.time.LocalDate
+import java.time.ZoneId
 // import java.util.concurrent.TimeUnit // Hapus jika tidak digunakan
 
 // Repository bertanggung jawab untuk abstraksi akses data (lokal & remote)
@@ -64,6 +66,13 @@ class DiaryRepository(
      */
     fun getAllEntries(): Flow<List<DiaryEntry>> { // <<< KOREKSI NAMA FUNGSI INI
         return diaryDao.getAllEntries()
+    }
+
+    fun getEntriesForDay(date: LocalDate): Flow<List<DiaryEntry>> {
+        val zone = ZoneId.systemDefault()
+        val start = date.atStartOfDay(zone).toInstant().toEpochMilli()
+        val end = date.plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli() - 1
+        return diaryDao.getEntriesInRange(start, end)
     }
 
     fun getAchievements(): Flow<List<Achievement>> = achievementDao.getAllAchievements()

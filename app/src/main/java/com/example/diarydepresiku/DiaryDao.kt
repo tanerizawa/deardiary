@@ -44,4 +44,9 @@ interface DiaryDao {
      */
     @Query("SELECT * FROM diary_entries ORDER BY creation_timestamp DESC")
     fun getAllEntries(): Flow<List<DiaryEntry>> // Mengembalikan Flow, tidak lagi suspend
+
+    @Query(
+        "SELECT * FROM diary_entries WHERE creation_timestamp BETWEEN :start AND :end ORDER BY creation_timestamp DESC"
+    )
+    fun getEntriesInRange(start: Long, end: Long): Flow<List<DiaryEntry>>
 }
