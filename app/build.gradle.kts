@@ -93,6 +93,7 @@ dependencies {
     implementation(libs.retrofit.converter.gson)
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging.interceptor)
+    implementation(libs.play-services-auth)
 
     // ---- Kotlin Coroutines Core ----
     implementation(libs.kotlinx.coroutines.core)

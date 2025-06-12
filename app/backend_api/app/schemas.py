@@ -54,3 +54,12 @@ class MoodStatsResponse(BaseModel):
     """Response schema for mood statistics."""
 
     stats: Dict[str, int]
+
+
+class UserCreate(BaseModel):
+    email: str
+    password: str
+
+
+class Token(BaseModel):
+    token: str

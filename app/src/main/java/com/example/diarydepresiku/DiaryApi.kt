@@ -5,6 +5,7 @@ import retrofit2.http.Body
 import retrofit2.http.POST
 import retrofit2.http.GET
 import com.google.gson.annotations.SerializedName // Penting untuk mapping JSON
+import retrofit2.http.*
 
 /**
  * Data class untuk body permintaan POST entri diary ke server.
@@ -34,6 +35,15 @@ data class MoodStatsResponse(
     @SerializedName("stats") val stats: Map<String, Int>
 )
 
+data class AuthRequest(
+    @SerializedName("email") val email: String,
+    @SerializedName("password") val password: String
+)
+
+data class TokenResponse(
+    @SerializedName("token") val token: String
+)
+
 /**
  * DiaryApi: Interface Retrofit untuk berkomunikasi dengan backend FastAPI.
  * Mendefinisikan semua endpoint API yang akan digunakan aplikasi.
@@ -55,6 +65,12 @@ interface DiaryApi {
      */
     @GET("stats/")
     suspend fun getMoodStats(): Response<MoodStatsResponse>
+
+    @POST("register/")
+    suspend fun register(@Body request: AuthRequest): Response<Unit>
+
+    @POST("login/")
+    suspend fun login(@Body request: AuthRequest): Response<TokenResponse>
 
     // (Opsional) Endpoint lain dapat didefinisikan di sini, misalnya:
     // @GET("entries/")
