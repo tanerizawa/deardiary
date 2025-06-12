@@ -21,6 +21,8 @@ import androidx.compose.material.icons.filled.Article
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.automirrored.filled.Article // ✅ Gunakan versi AutoMirrored
 
+import com.example.diarydepresiku.ui.components.AnimatedFab
+
 import com.example.diarydepresiku.ui.theme.DiarydepresikuTheme
 import com.example.diarydepresiku.ui.screens.DiaryFormScreen
 import com.example.diarydepresiku.ui.screens.HistoryScreen
