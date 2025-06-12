@@ -39,7 +39,12 @@ def client():
 def test_create_and_get_entries(client):
     response = client.post(
         "/entries/",
-        json={"content": "hello", "mood": "Senang", "timestamp": 1, "activities": ["A"]},
+        json={
+            "content": "hello",
+            "mood": "Senang",
+            "timestamp": 1,
+            "activities": ["A"],
+        },
     )
     assert response.status_code == 201
     data = response.json()
