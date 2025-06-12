@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import com.example.diarydepresiku.DiaryViewModel
 import com.example.diarydepresiku.DiaryViewModelFactory // Pastikan ini diimpor
 import com.example.diarydepresiku.MyApplication // Pastikan ini diimpor
+import com.example.diarydepresiku.ReminderPreferences
 import com.example.diarydepresiku.ui.theme.DiarydepresikuTheme // Pastikan ini diimpor
 import com.example.diarydepresiku.ui.theme.SoftYellow
 import com.example.diarydepresiku.ui.MoodSlider
@@ -56,6 +57,8 @@ fun DiaryFormScreen(
     val diaryEntries by viewModel.diaryEntries.collectAsState()
     val statusMessage by viewModel.statusMessage.collectAsState()
     val dateFormat = remember { SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.getDefault()) }
+    val prefs = (LocalContext.current.applicationContext as MyApplication).reminderPreferences
+    val userName by prefs.userName.collectAsState(initial = "")
 
     Column(
         modifier = modifier
@@ -63,6 +66,12 @@ fun DiaryFormScreen(
             .fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
+        if (userName.isNotBlank()) {
+            Text(
+                text = "Halo, $userName!",
+                style = MaterialTheme.typography.titleLarge
+            )
+        }
         OutlinedTextField(
             value = diaryText,
             onValueChange = { diaryText = it },

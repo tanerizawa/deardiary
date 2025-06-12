@@ -30,6 +30,9 @@ class ReminderPreferences(private val context: Context) {
     val fontScale: Flow<Float> =
         context.dataStore.data.map { it[KEY_FONT_SCALE]?.toFloat() ?: 1f }
 
+    val userName: Flow<String> =
+        context.dataStore.data.map { it[KEY_USER_NAME] ?: "" }
+
     suspend fun setReminderEnabled(enabled: Boolean) {
         context.dataStore.edit { it[KEY_ENABLED] = enabled }
     }
@@ -46,10 +49,15 @@ class ReminderPreferences(private val context: Context) {
         context.dataStore.edit { it[KEY_FONT_SCALE] = scale.toString() }
     }
 
+    suspend fun setUserName(name: String) {
+        context.dataStore.edit { it[KEY_USER_NAME] = name }
+    }
+
     companion object {
         private val KEY_ENABLED = booleanPreferencesKey("reminder_enabled")
         private val KEY_TIME = stringPreferencesKey("reminder_time")
         private val KEY_DARK_MODE = booleanPreferencesKey("dark_mode")
         private val KEY_FONT_SCALE = stringPreferencesKey("font_scale")
+        private val KEY_USER_NAME = stringPreferencesKey("user_name")
     }
 }
