@@ -30,7 +30,7 @@ class FakeDiaryApi : DiaryApi {
     var posted: DiaryEntryRequest? = null
     override suspend fun postEntry(entry: DiaryEntryRequest): Response<DiaryEntryResponse> {
         posted = entry
-        return Response.success(DiaryEntryResponse(1, entry.content, entry.mood, entry.timestamp))
+        return Response.success(DiaryEntryResponse(1, entry.content, entry.mood, entry.timestamp, entry.activities))
     }
     override suspend fun getMoodStats(): Response<MoodStatsResponse> {
         return Response.success(MoodStatsResponse(mapOf("Senang" to 1)))
@@ -54,10 +54,11 @@ class DiaryRepositoryTest {
         val api = FakeDiaryApi()
         val repository = DiaryRepository(dao, api, FakeAchievementDao())
 
-        val status = repository.addEntry("Hello", "Senang")
+        val status = repository.addEntry("Hello", "Senang", listOf("Bekerja"))
 
         assertEquals(1, dao.entries.size)
         assertEquals("Hello", dao.entries[0].content)
+        assertEquals(listOf("Bekerja"), dao.entries[0].activities)
         assertEquals("Senang", api.posted?.mood)
         assertEquals(EntryStatus.ONLINE, status)
     }
@@ -68,7 +69,7 @@ class DiaryRepositoryTest {
         val api = FailingDiaryApi()
         val repository = DiaryRepository(dao, api, FakeAchievementDao())
 
-        val status = repository.addEntry("Hi", "Sedih")
+        val status = repository.addEntry("Hi", "Sedih", emptyList())
 
         assertEquals(1, dao.entries.size)
         assertEquals(EntryStatus.OFFLINE, status)

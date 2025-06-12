@@ -13,4 +13,14 @@ class Converters {
     fun dateToTimestamp(date: Date?): Long? {
         return date?.time
     }
+
+    @TypeConverter
+    fun fromActivities(value: String?): List<String> {
+        return value?.split("|")?.filter { it.isNotBlank() } ?: emptyList()
+    }
+
+    @TypeConverter
+    fun activitiesToString(list: List<String>?): String? {
+        return list?.joinToString("|")
+    }
 }

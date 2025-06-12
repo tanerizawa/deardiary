@@ -16,6 +16,9 @@ data class DiaryEntry(
     @ColumnInfo(name = "mood")
     val mood: String, // Mood yang dipilih untuk entri ini
 
+    @ColumnInfo(name = "activities")
+    val activities: List<String>,
+
     @ColumnInfo(name = "creation_timestamp") // Menggunakan nama kolom yang jelas
     val creationTimestamp: Long // Waktu pembuatan entri dalam bentuk Unix timestamp (Long)
 )

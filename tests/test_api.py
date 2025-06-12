@@ -39,11 +39,12 @@ def client():
 def test_create_and_get_entries(client):
     response = client.post(
         "/entries/",
-        json={"content": "hello", "mood": "Senang", "timestamp": 1},
+        json={"content": "hello", "mood": "Senang", "timestamp": 1, "activities": ["A"]},
     )
     assert response.status_code == 201
     data = response.json()
     assert data["content"] == "hello"
+    assert data["activities"] == ["A"]
 
     resp = client.get("/entries/")
     assert resp.status_code == 200
@@ -53,11 +54,11 @@ def test_create_and_get_entries(client):
 def test_mood_stats(client):
     client.post(
         "/entries/",
-        json={"content": "hi", "mood": "Sedih", "timestamp": 2},
+        json={"content": "hi", "mood": "Sedih", "timestamp": 2, "activities": []},
     )
     client.post(
         "/entries/",
-        json={"content": "hey", "mood": "Sedih", "timestamp": 3},
+        json={"content": "hey", "mood": "Sedih", "timestamp": 3, "activities": []},
     )
     resp = client.get("/stats/")
     assert resp.status_code == 200

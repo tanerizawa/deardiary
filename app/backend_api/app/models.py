@@ -18,6 +18,8 @@ class DiaryEntry(Base):
     # Nama kolom untuk mood.
     mood = Column(String, nullable=False, index=True)  # Menambahkan index
 
+    activities = Column(String, nullable=False, default="")
+
     # Nama kolom untuk timestamp.
     # Menggunakan BigInteger agar dapat menyimpan nilai Long dari Android/Kotlin.
     # Harus konsisten dengan 'timestamp: int' di schemas.py dan 'creationTimestamp: Long' di DiaryEntry.kt.

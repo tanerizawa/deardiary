@@ -2,8 +2,10 @@
 from pydantic import (
     BaseModel,
     Field,
+    field_serializer,
+    model_validator,
 )  # Import Field jika ingin menambahkan validasi tambahan
-from typing import Dict
+from typing import Dict, List
 
 
 # Schema dasar untuk entri diary (digunakan sebagai base class untuk request/response)
@@ -23,6 +25,8 @@ class DiaryEntryBase(BaseModel):
         int  # Tipe data int di Python setara dengan Long di Kotlin untuk angka besar
     )
 
+    activities: List[str] = Field(default_factory=list)
+
 
 # Schema untuk pembuatan entri (dikirim dari client/Android, tanpa ID)
 class DiaryEntryCreate(DiaryEntryBase):
@@ -35,9 +39,17 @@ class DiaryEntryResponse(
 ):  # Mengganti 'Entry' menjadi 'DiaryEntryResponse'
     id: int  # ID entri dari database
 
-    class Config:
-        # Untuk Pydantic v2, ganti orm_mode = True menjadi from_attributes = True
-        from_attributes = True  # Memungkinkan konversi otomatis dari model ORM (SQLAlchemy) ke Pydantic schema
+    model_config = {
+        "from_attributes": True,
+    }
+
+    @model_validator(mode="before")
+    def _convert_activities(cls, data):
+        if isinstance(data, dict) and isinstance(data.get("activities"), str):
+            data["activities"] = data["activities"].split("|") if data["activities"] else []
+        elif hasattr(data, "activities") and isinstance(data.activities, str):
+            setattr(data, "activities", data.activities.split("|") if data.activities else [])
+        return data
 
 
 # Schema untuk permintaan analisis AI (dummy)

@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -27,6 +28,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Icon
+import androidx.compose.material3.FilterChip
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.Alignment
 import com.example.diarydepresiku.DiaryViewModel
@@ -43,6 +45,7 @@ import java.util.Locale
 
 // Daftar pilihan mood yang tersedia - Pindahkan di sini atau di file tersendiri
 val moodOptions = listOf("Senang", "Cemas", "Sedih", "Marah")
+val activityOptions = listOf("Olahraga", "Membaca", "Bersosialisasi", "Bekerja", "Meditasi")
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,6 +56,7 @@ fun DiaryFormScreen(
 ) {
     var diaryText by remember { mutableStateOf("") }
     var selectedMood by remember { mutableStateOf(moodOptions[0]) }
+    val selectedActivities = remember { mutableStateListOf<String>() }
 
     val diaryEntries by viewModel.diaryEntries.collectAsState()
     val statusMessage by viewModel.statusMessage.collectAsState()
@@ -93,14 +97,39 @@ fun DiaryFormScreen(
             modifier = Modifier.fillMaxWidth()
         )
 
+        Text(
+            text = "Aktivitas:",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(top = 8.dp)
+        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            activityOptions.forEach { act ->
+                FilterChip(
+                    selected = selectedActivities.contains(act),
+                    onClick = {
+                        if (selectedActivities.contains(act)) {
+                            selectedActivities.remove(act)
+                        } else {
+                            selectedActivities.add(act)
+                        }
+                    },
+                    label = { Text(act) }
+                )
+            }
+        }
+
         Spacer(Modifier.height(16.dp))
 
         Button(
             onClick = {
                 if (diaryText.isNotBlank()) {
-                    viewModel.saveEntry(diaryText, selectedMood)
+                    viewModel.saveEntry(diaryText, selectedMood, selectedActivities.toList())
                     diaryText = ""
                     selectedMood = moodOptions[0]
+                    selectedActivities.clear()
                 }
             },
             modifier = Modifier.fillMaxWidth(),

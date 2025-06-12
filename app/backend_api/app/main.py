@@ -54,7 +54,7 @@ async def create_diary_entry_endpoint(  # Nama fungsi yang lebih deskriptif
     # Memanggil fungsi CRUD untuk membuat entri di database
     # Menggunakan properti 'content' dan 'timestamp' sesuai dengan schemas dan models
     db_entry = crud.create_diary_entry(db=db, entry=entry)
-    return db_entry  # Akan otomatis dikonversi ke schema DiaryEntryResponse
+    return schemas.DiaryEntryResponse.model_validate(db_entry)
 
 
 # Endpoint untuk mendapatkan semua entri diary
@@ -72,7 +72,7 @@ async def read_diary_entries_endpoint(
     db: Session = Depends(get_db),
 ):
     entries = crud.get_diary_entries(db=db, skip=skip, limit=limit)
-    return entries
+    return [schemas.DiaryEntryResponse.model_validate(e) for e in entries]
 
 
 # Endpoint untuk mendapatkan entri diary berdasarkan ID
@@ -90,7 +90,7 @@ async def read_diary_entry_by_id_endpoint(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Entry not found"
         )
-    return db_entry
+    return schemas.DiaryEntryResponse.model_validate(db_entry)
 
 
 # Endpoint untuk analisis AI terhadap teks diary
