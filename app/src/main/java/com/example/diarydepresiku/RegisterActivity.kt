@@ -16,6 +16,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.ui.Alignment
 import kotlinx.coroutines.launch
+import com.example.diarydepresiku.ui.theme.DiarydepresikuTheme
+
 
 class RegisterActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

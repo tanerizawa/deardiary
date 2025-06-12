@@ -10,28 +10,33 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.material3.MaterialTheme
+import com.example.diarydepresiku.ui.theme.DiarydepresikuTheme
 import kotlinx.coroutines.delay
 
 class SplashActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+
         setContent {
             val application = application as MyApplication
             val darkMode by application.reminderPreferences.darkMode.collectAsState(initial = false)
             val fontScale by application.reminderPreferences.fontScale.collectAsState(initial = 1f)
 
             DiarydepresikuTheme(darkTheme = darkMode, fontScale = fontScale) {
-                SplashScreen {
-                    startActivity(Intent(this, LoginActivity::class.java))
-                    finish()
-                }
+                SplashScreen(
+                    onTimeout = {
+                        startActivity(Intent(this, LoginActivity::class.java))
+                        finish()
+                    }
+                )
             }
         }
     }
@@ -40,11 +45,14 @@ class SplashActivity : ComponentActivity() {
 @Composable
 private fun SplashScreen(onTimeout: () -> Unit) {
     var visible by remember { mutableStateOf(false) }
+
+    // Trigger animasi dan timeout
     LaunchedEffect(Unit) {
         visible = true
         delay(1500)
         onTimeout()
     }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -53,13 +61,13 @@ private fun SplashScreen(onTimeout: () -> Unit) {
     ) {
         AnimatedVisibility(
             visible = visible,
-            enter = fadeIn(animationSpec = tween(durationMillis = 1000))
+            enter = fadeIn(animationSpec = tween(1000))
         ) {
             Image(
                 painter = painterResource(id = R.drawable.app_logo),
-                contentDescription = null
+                contentDescription = "Logo Aplikasi",
+                modifier = Modifier.size(180.dp)
             )
         }
     }
 }
-

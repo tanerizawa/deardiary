@@ -93,7 +93,7 @@ dependencies {
     implementation(libs.retrofit.converter.gson)
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging.interceptor)
-    implementation(libs.play-services-auth)
+    implementation(libs.play.services.auth)
 
     // ---- Kotlin Coroutines Core ----
     implementation(libs.kotlinx.coroutines.core)
@@ -109,4 +109,7 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    implementation("com.google.android.material:material:1.12.0")
+
 }
