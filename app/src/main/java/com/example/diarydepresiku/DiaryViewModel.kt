@@ -44,6 +44,9 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
     private val _statusMessage = MutableStateFlow<String?>(null)
     val statusMessage: StateFlow<String?> = _statusMessage.asStateFlow()
 
+    private val _analysisResult = MutableStateFlow<String?>(null)
+    val analysisResult: StateFlow<String?> = _analysisResult.asStateFlow()
+
     // <<< TAMBAHAN UNTUK ANALISIS MOOD >>>
     // State untuk menampung hitungan mood (Map<MoodName, Count>)
     private val _moodCounts = MutableStateFlow<Map<String, Int>>(emptyMap())
@@ -132,6 +135,7 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
                 } else {
                     "Entri disimpan offline"
                 }
+                _analysisResult.value = repository.analyzeEntry(content)
                 // Perbarui statistik mood setelah menambah entri
                 val stats = repository.getMoodStats()
                 if (stats != null) {
@@ -148,6 +152,10 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
                 println("Error saving entry: ${e.stackTraceToString()}") // Log error lengkap
             }
         }
+    }
+
+    fun clearAnalysisResult() {
+        _analysisResult.value = null
     }
 
     /** Hitung frekuensi mood dalam rentang hari tertentu */

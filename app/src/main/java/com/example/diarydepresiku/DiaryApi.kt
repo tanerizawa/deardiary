@@ -47,6 +47,14 @@ data class TokenResponse(
     @SerializedName("token") val token: String
 )
 
+data class AnalyzeRequest(
+    @SerializedName("text") val text: String
+)
+
+data class AnalyzeResponse(
+    @SerializedName("analysis") val analysis: String
+)
+
 /**
  * DiaryApi: Interface Retrofit untuk berkomunikasi dengan backend FastAPI.
  * Mendefinisikan semua endpoint API yang akan digunakan aplikasi.
@@ -74,6 +82,9 @@ interface DiaryApi {
 
     @POST("login/")
     suspend fun login(@Body request: AuthRequest): Response<TokenResponse>
+
+    @POST("analyze")
+    suspend fun analyzeEntry(@Body request: AnalyzeRequest): Response<AnalyzeResponse>
 
     // (Opsional) Endpoint lain dapat didefinisikan di sini, misalnya:
     // @GET("entries/")
