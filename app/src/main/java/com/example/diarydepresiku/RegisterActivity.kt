@@ -11,6 +11,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
+import com.example.diarydepresiku.ui.theme.SoftYellow
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.ui.Alignment
 import kotlinx.coroutines.launch
 
 class RegisterActivity : ComponentActivity() {
@@ -59,6 +63,25 @@ fun RegisterScreen(onRegister: (String, String) -> Unit) {
         Spacer(Modifier.height(8.dp))
         Button(onClick = { onRegister(email, password) }, modifier = Modifier.fillMaxWidth()) {
             Text("Register")
+        }
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .padding(top = 8.dp)
+                .fillMaxWidth()
+        ) {
+            Icon(
+                Icons.Default.Lock,
+                contentDescription = null,
+                tint = SoftYellow
+            )
+            Spacer(Modifier.width(4.dp))
+            Text(
+                text = "Privasi Anda terlindungi dengan enkripsi end-to-end.",
+                color = SoftYellow,
+                style = MaterialTheme.typography.labelSmall
+            )
         }
     }
 }

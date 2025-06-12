@@ -16,6 +16,10 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.example.diarydepresiku.ui.theme.SoftYellow
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.ui.Alignment
 import kotlinx.coroutines.launch
 
 class LoginActivity : ComponentActivity() {
@@ -105,6 +109,25 @@ fun LoginScreen(
         Spacer(Modifier.height(4.dp))
         TextButton(onClick = onRegister, modifier = Modifier.fillMaxWidth()) {
             Text("Register")
+        }
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .padding(top = 8.dp)
+                .fillMaxWidth()
+        ) {
+            Icon(
+                Icons.Default.Lock,
+                contentDescription = null,
+                tint = SoftYellow
+            )
+            Spacer(Modifier.width(4.dp))
+            Text(
+                text = "Privasi Anda terlindungi dengan enkripsi end-to-end.",
+                color = SoftYellow,
+                style = MaterialTheme.typography.labelSmall
+            )
         }
     }
 }
