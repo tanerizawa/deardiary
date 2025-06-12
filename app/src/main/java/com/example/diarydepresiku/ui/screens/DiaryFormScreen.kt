@@ -238,6 +238,16 @@ fun DiaryFormScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Mood Summary Widget
+        if (allEntries.isNotEmpty()) {
+            MoodSummaryWidget(
+                moodCounts = moodCounts,
+                totalEntries = allEntries.size
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+
         // Tips card
         TipsCard()
     }
