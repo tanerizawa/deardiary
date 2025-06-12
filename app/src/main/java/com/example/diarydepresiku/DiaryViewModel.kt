@@ -109,10 +109,8 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
             entryStreak.collect { streak ->
                 if (streak >= 30 && achievements.value.none { it.name == "30 Day Streak" }) {
                     repository.addAchievement("30 Day Streak")
-                } else if (streak >= 7 && achievements.value.none { it.name == "7 Day Streak" }) {
-                    repository.addAchievement("7 Day Streak")
-                } else if (streak >= 3 && achievements.value.none { it.name == "3 Day Streak" }) {
-                    repository.addAchievement("3 Day Streak")
+                } else if (streak >= 5 && achievements.value.none { it.name == "5 Day Streak" }) {
+                    repository.addAchievement("5 Day Streak")
                 }
             }
         }
