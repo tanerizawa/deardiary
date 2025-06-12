@@ -5,6 +5,7 @@
   "scripts": {
     "postinstall": "node setup-python.js",
     "dev": "node run-fastapi.js",
+    "dev:mock": "node mock-server.js",
     "start": "npm run dev",
     "test": "cd tests && python3 -m pytest",
     "build": "echo 'Building Android app...' && ./gradlew build"
