@@ -69,8 +69,8 @@ __pycache__/
 .pytest_cache/
 
 # Database files (FastAPI/SQLAlchemy)
-*.db                      # e.g., diary.db (this will ignore any .db file in your project root, be careful if you have other dbs you want to track)
-!app/backend_api/app/diary.db  # Example: UNCOMMENT AND ADJUST if you want to track a specific database file
+# Ignore the default SQLite database used by the API
+diary.db
 # OR: If your FastAPI database file is always named `diary.db` and you want to track it only there:
 #!backend/app/diary.db # If your backend is `app/backend/` as per your latest structure
 #!backend_api/app/diary.db # If your backend is `app/backend_api/app/` as per recommended structure

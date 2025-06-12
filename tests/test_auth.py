@@ -1,10 +1,12 @@
 import sys
+import os
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
+os.environ["SQLALCHEMY_DATABASE_URL"] = "sqlite:///:memory:"
 sys.path.append("app/backend_api")
 
 from app.main import app
