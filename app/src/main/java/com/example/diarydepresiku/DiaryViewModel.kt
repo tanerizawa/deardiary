@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext // Mungkin tidak langsung terpakai di sini
 import java.util.concurrent.TimeUnit
+import com.example.diarydepresiku.EntryStatus
 
 /**
  * DiaryViewModel: Mengelola UI state dan berinteraksi dengan Repository untuk operasi data.
@@ -92,9 +93,12 @@ class DiaryViewModel(application: Application) : AndroidViewModel(application) {
         // Meluncurkan coroutine dalam viewModelScope
         viewModelScope.launch {
             try {
-                repository.addEntry(content, mood) // <<< KOREKSI: Panggil addEntry di repository
-                // Memberikan feedback sukses ke UI
-                _statusMessage.value = "Entri berhasil disimpan!"
+                val status = repository.addEntry(content, mood)
+                _statusMessage.value = if (status == EntryStatus.ONLINE) {
+                    "Entri berhasil disimpan!"
+                } else {
+                    "Entri disimpan offline"
+                }
                 // Perbarui statistik mood setelah menambah entri
                 val stats = repository.getMoodStats()
                 if (stats != null) {

@@ -12,7 +12,7 @@ class DiaryRepository(
     private val diaryApi: DiaryApi // API service disuntikkan
 ) {
 
-    suspend fun addEntry(content: String, mood: String) {
+    suspend fun addEntry(content: String, mood: String): EntryStatus {
         val currentTimestamp = System.currentTimeMillis()
 
         val localEntry = DiaryEntry(
@@ -33,7 +33,7 @@ class DiaryRepository(
             timestamp = currentTimestamp
         )
 
-        withContext(Dispatchers.IO) {
+        val status = withContext(Dispatchers.IO) {
             try {
                 // Membutuhkan definisi DiaryApi dan Retrofit setup
                 val response = diaryApi.postEntry(remoteRequest)
@@ -41,14 +41,18 @@ class DiaryRepository(
                 if (response.isSuccessful) {
                     val responseBody = response.body()
                     println("Entry sent to server successfully: $responseBody")
+                    EntryStatus.ONLINE
                 } else {
                     val errorBody = response.errorBody()?.string()
                     println("Failed to send entry to server: ${response.code()} - $errorBody")
+                    EntryStatus.OFFLINE
                 }
             } catch (e: Exception) {
                 println("Network error sending entry: ${e.message}")
+                EntryStatus.OFFLINE
             }
         }
+        return status
     }
 
     /**

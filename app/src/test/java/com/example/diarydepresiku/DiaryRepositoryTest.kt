@@ -6,6 +6,10 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import retrofit2.Response
+import okhttp3.ResponseBody
+
+// Status flag for uploads
+import com.example.diarydepresiku.EntryStatus
 
 class FakeDiaryDao : DiaryDao {
     val entries = mutableListOf<DiaryEntry>()
@@ -27,6 +31,16 @@ class FakeDiaryApi : DiaryApi {
     }
 }
 
+class FailingDiaryApi : DiaryApi {
+    override suspend fun postEntry(entry: DiaryEntryRequest): Response<DiaryEntryResponse> {
+        return Response.error(500, okhttp3.ResponseBody.create(null, ""))
+    }
+
+    override suspend fun getMoodStats(): Response<MoodStatsResponse> {
+        return Response.success(MoodStatsResponse(emptyMap()))
+    }
+}
+
 class DiaryRepositoryTest {
     @Test
     fun addEntry_savesLocallyAndCallsApi() = runBlocking {
@@ -34,11 +48,24 @@ class DiaryRepositoryTest {
         val api = FakeDiaryApi()
         val repository = DiaryRepository(dao, api)
 
-        repository.addEntry("Hello", "Senang")
+        val status = repository.addEntry("Hello", "Senang")
 
         assertEquals(1, dao.entries.size)
         assertEquals("Hello", dao.entries[0].content)
         assertEquals("Senang", api.posted?.mood)
+        assertEquals(EntryStatus.ONLINE, status)
+    }
+
+    @Test
+    fun addEntry_returnsOfflineOnFailure() = runBlocking {
+        val dao = FakeDiaryDao()
+        val api = FailingDiaryApi()
+        val repository = DiaryRepository(dao, api)
+
+        val status = repository.addEntry("Hi", "Sedih")
+
+        assertEquals(1, dao.entries.size)
+        assertEquals(EntryStatus.OFFLINE, status)
     }
 
     @Test
