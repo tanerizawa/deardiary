@@ -35,8 +35,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.FilterChip
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.Alignment
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.TextButton
 import com.example.diarydepresiku.DiaryViewModel
 import com.example.diarydepresiku.DiaryViewModelFactory // Pastikan ini diimpor
 import com.example.diarydepresiku.MyApplication // Pastikan ini diimpor
@@ -72,12 +70,10 @@ fun DiaryFormScreen(
     val statusMessage by viewModel.statusMessage.collectAsState()
     val analysisResult by viewModel.analysisResult.collectAsState()
     val articles by contentViewModel.articles.collectAsState()
-    var showDialog by remember { mutableStateOf(false) }
     val dateFormat = remember { SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.getDefault()) }
     LaunchedEffect(analysisResult) {
         if (analysisResult != null) {
             contentViewModel.refreshArticles(filterMood = analysisResult)
-            showDialog = true
         }
     }
     val prefs = (LocalContext.current.applicationContext as MyApplication).reminderPreferences
@@ -196,63 +192,37 @@ fun DiaryFormScreen(
             }
         }
 
-        if (showDialog && analysisResult != null) {
-            AnalysisDialog(
-                analysis = analysisResult!!,
-                articleTitles = articles.take(3).mapNotNull { it.title },
-                onDismiss = {
-                    showDialog = false
-                    viewModel.clearAnalysisResult()
-                },
-                onViewArticles = {
-                    showDialog = false
-                    viewModel.clearAnalysisResult()
-                    onNavigateToContent?.invoke()
+        if (analysisResult != null) {
+            Column(modifier = Modifier.padding(top = 16.dp)) {
+                Text(text = "Mood Dominan", style = MaterialTheme.typography.titleSmall)
+                Text(analysisResult!!, modifier = Modifier.padding(top = 4.dp))
+                Spacer(Modifier.height(8.dp))
+                articles.take(3).forEach { article ->
+                    article.title?.let { Text("\u2022 $it", style = MaterialTheme.typography.bodySmall) }
                 }
-            )
-        }
-
-        Spacer(Modifier.height(16.dp))
-        Text(text = "Entri Terbaru:", style = MaterialTheme.typography.titleSmall)
-        if (diaryEntries.isEmpty()) {
-            Text("Belum ada entri.")
+                Button(
+                    onClick = {
+                        viewModel.clearAnalysisResult()
+                        onNavigateToContent?.invoke()
+                    },
+                    modifier = Modifier.padding(top = 8.dp)
+                ) { Text("Lihat Artikel") }
+            }
         } else {
-            Column {
-                diaryEntries.takeLast(3).forEach { entry ->
-                    val date = dateFormat.format(Date(entry.creationTimestamp))
-                    Text("($date) Mood: ${entry.mood} - ${entry.content.take(50)}...")
+            Spacer(Modifier.height(16.dp))
+            Text(text = "Entri Terbaru:", style = MaterialTheme.typography.titleSmall)
+            if (diaryEntries.isEmpty()) {
+                Text("Belum ada entri.")
+            } else {
+                Column {
+                    diaryEntries.takeLast(3).forEach { entry ->
+                        val date = dateFormat.format(Date(entry.creationTimestamp))
+                        Text("($date) Mood: ${entry.mood} - ${entry.content.take(50)}...")
+                    }
                 }
             }
         }
     }
-}
-
-@Composable
-private fun AnalysisDialog(
-    analysis: String,
-    articleTitles: List<String>,
-    onDismiss: () -> Unit,
-    onViewArticles: () -> Unit
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            TextButton(onClick = onViewArticles) { Text("Lihat Artikel") }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Tutup") }
-        },
-        title = { Text(text = "Mood Dominan") },
-        text = {
-            Column {
-                Text(analysis)
-                Spacer(Modifier.height(8.dp))
-                articleTitles.forEach { title ->
-                    Text("\u2022 $title", style = MaterialTheme.typography.bodySmall)
-                }
-            }
-        }
-    )
 }
 
 // Preview composable untuk DiaryFormScreen
