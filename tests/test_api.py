@@ -82,7 +82,7 @@ def test_analyze_entry(client, monkeypatch):
             return {"candidates": [{"content": {"parts": [{"text": "Positif"}]}}]}
 
     monkeypatch.setenv("GEMINI_API_KEY", "dummy")
-    monkeypatch.setattr("app.main.requests.post", lambda *a, **k: MockResp())
+    monkeypatch.setattr("app.ai_utils.requests.post", lambda *a, **k: MockResp())
     resp = client.post("/analyze", json={"text": "saya senang"})
     assert resp.status_code == 200
     assert resp.json()["analysis"] == "Mood terdeteksi positif"
@@ -105,7 +105,7 @@ def test_gemini_articles(client, monkeypatch):
             }
 
     monkeypatch.setenv("GEMINI_API_KEY", "dummy")
-    monkeypatch.setattr("app.main.requests.post", lambda *a, **k: MockResp())
+    monkeypatch.setattr("app.ai_utils.requests.post", lambda *a, **k: MockResp())
     resp = client.post("/gemini_articles/", json={"text": "hi"})
     assert resp.status_code == 200
     assert resp.json() == [{"title": "A", "summary": "B"}]
@@ -116,7 +116,7 @@ def test_gemini_articles_error(client, monkeypatch):
         raise requests.RequestException("bad")
 
     monkeypatch.setenv("GEMINI_API_KEY", "dummy")
-    monkeypatch.setattr("app.main.requests.post", raise_exc)
+    monkeypatch.setattr("app.ai_utils.requests.post", raise_exc)
     resp = client.post("/gemini_articles/", json={"text": "hi"})
     assert resp.status_code == 500
 
@@ -130,7 +130,7 @@ def test_openrouter_caption(client, monkeypatch):
             return {"choices": [{"message": {"content": "A boardwalk"}}]}
 
     monkeypatch.setenv("OPENROUTER_API_KEY", "dummy")
-    monkeypatch.setattr("app.main.requests.post", lambda *a, **k: MockResp())
+    monkeypatch.setattr("app.ai_utils.requests.post", lambda *a, **k: MockResp())
     resp = client.post(
         "/openrouter_caption/",
         json={"image_url": "http://example.com/img.jpg"},
@@ -144,7 +144,7 @@ def test_openrouter_caption_error(client, monkeypatch):
         raise requests.RequestException("bad")
 
     monkeypatch.setenv("OPENROUTER_API_KEY", "dummy")
-    monkeypatch.setattr("app.main.requests.post", raise_exc)
+    monkeypatch.setattr("app.ai_utils.requests.post", raise_exc)
     resp = client.post(
         "/openrouter_caption/",
         json={"image_url": "http://example.com/img.jpg"},
