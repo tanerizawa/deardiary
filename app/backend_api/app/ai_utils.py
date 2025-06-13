@@ -28,13 +28,14 @@ def extract_json_from_markdown(text: str) -> str:
     """
     Extracts JSON content from a markdown-style block formatted with triple backticks.
 
-    Example expected input:
-    ```json
-    [
-        {"title": "...", "summary": "..."},
-        ...
-    ]
-    ```
+    Args:
+        text (str): The raw response text that may include JSON wrapped in markdown.
+
+    Returns:
+        str: Cleaned JSON string without markdown syntax.
+
+    Raises:
+        InvalidResponseError: If JSON block is not found in the expected format.
     """
     match = re.search(r"```json\s*(.*?)\s*```", text, re.DOTALL)
     if match:
@@ -53,6 +54,10 @@ async def caption_image_with_openrouter(image_url: str) -> str:
 
     Returns:
         str: A textual description of the image.
+
+    Raises:
+        MissingAPIKeyError: If API key is not set.
+        RuntimeError: If OpenRouter API fails to return valid result.
     """
     try:
         client = get_openrouter_client()
@@ -76,7 +81,7 @@ async def caption_image_with_openrouter(image_url: str) -> str:
         data = await asyncio.to_thread(client.chat.completions.create, **payload)
         return data.choices[0].message.content
     except Exception as e:
-        raise RuntimeError(f"Error from OpenRouter API: {e}")
+        raise RuntimeError(f"Error from OpenRouter API: {e}") from e
 
 
 def generate_articles_with_openrouter(text: str) -> List[schemas.ArticleResponse]:
@@ -84,10 +89,14 @@ def generate_articles_with_openrouter(text: str) -> List[schemas.ArticleResponse
     Requests the OpenRouter API to generate three article titles and summaries in JSON format.
 
     Args:
-        text (str): The input text or topic to base the articles on.
+        text (str): The user input to base article ideas on.
 
     Returns:
-        List[schemas.ArticleResponse]: List of parsed article data.
+        List[schemas.ArticleResponse]: Parsed list of article suggestions.
+
+    Raises:
+        MissingAPIKeyError: If API key is missing.
+        InvalidResponseError: If response is malformed or not JSON.
     """
     try:
         client = get_openrouter_client()
@@ -102,8 +111,7 @@ def generate_articles_with_openrouter(text: str) -> List[schemas.ArticleResponse
                 "content": (
                         "Buat tiga judul artikel beserta ringkasan singkat dalam format JSON "
                         "[{'title': 'Judul', 'summary': 'Ringkasan'}] tanpa tambahan penjelasan. "
-                        "Balas hanya dengan JSON.\n"
-                        + text
+                        "Balas hanya dengan JSON.\n" + text
                 ),
             }
         ],
@@ -117,8 +125,8 @@ def generate_articles_with_openrouter(text: str) -> List[schemas.ArticleResponse
             json_str = extract_json_from_markdown(text_resp)
             articles = json.loads(json_str)
         except Exception as e:
-            logging.error("OpenRouter raw response: %s", text_resp)
-            raise InvalidResponseError("Invalid JSON in OpenRouter response") from e
+            logging.error("[OpenRouter JSON Parsing Error] Raw response: %s", text_resp)
+            raise InvalidResponseError("Invalid JSON format in OpenRouter response.") from e
 
         return [schemas.ArticleResponse(**a) for a in articles]
 

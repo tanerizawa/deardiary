@@ -1,10 +1,17 @@
-# app/main.py: Aplikasi FastAPI dan endpoint-endpoint API
+# app/main.py
+
 from fastapi import FastAPI, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
 from dotenv import load_dotenv
-import os
+import logging
 
+# Load environment variables
+load_dotenv()
+
+# Import internal modules
+from . import models, schemas, crud, openrouter
+from .database import engine, get_db
 from .ai_utils import (
     caption_image_with_openrouter,
     generate_articles_with_openrouter,
@@ -13,105 +20,113 @@ from .ai_utils import (
     InvalidResponseError,
 )
 
-from . import crud
-from . import models, schemas, openrouter
-from .database import engine, get_db
-
+# Initialize FastAPI application
 app = FastAPI(
     title="Diary Depresiku API",
-    description="API untuk menyimpan dan mengelola entri diary, serta fitur analisis mood.",
-    version="0.1.0",
+    description="API untuk mencatat suasana hati, menganalisis emosi, dan mendapatkan saran artikel berbasis AI.",
+    version="1.0.0",
 )
 
+# Create tables if not exist
 models.Base.metadata.create_all(bind=engine)
 
+# -------------------------
+# AUTENTIKASI
+# -------------------------
 
 @app.post("/register/", status_code=status.HTTP_201_CREATED)
 async def register_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    """Registrasi pengguna baru"""
     if crud.get_user_by_email(db, user.email):
-        raise HTTPException(status_code=400, detail="Email already registered")
+        raise HTTPException(status_code=400, detail="Email sudah terdaftar")
     crud.create_user(db, user)
     return {"message": "User created"}
 
 
 @app.post("/login/", response_model=schemas.Token)
 async def login_user(user: schemas.UserLogin, db: Session = Depends(get_db)):
+    """Login dan autentikasi pengguna"""
     if not crud.authenticate_user(db, user.email, user.password):
-        raise HTTPException(status_code=400, detail="Invalid credentials")
-    return {"token": "dummy"}
+        raise HTTPException(status_code=400, detail="Email atau password salah")
+    return {"token": "dummy"}  # Ganti dengan sistem token nyata jika perlu
 
+# -------------------------
+# ENTRI DIARY
+# -------------------------
 
-@app.post(
-    "/entries/",
-    response_model=schemas.DiaryEntryResponse,
-    status_code=status.HTTP_201_CREATED,
-)
-async def create_diary_entry_endpoint(
-    entry: schemas.DiaryEntryCreate, db: Session = Depends(get_db)
-):
+@app.post("/entries/", response_model=schemas.DiaryEntryResponse, status_code=201)
+async def create_diary_entry(entry: schemas.DiaryEntryCreate, db: Session = Depends(get_db)):
+    """Menyimpan entri suasana hati harian"""
     try:
-        db_entry = crud.create_diary_entry(db=db, entry=entry)
+        db_entry = crud.create_diary_entry(db, entry)
         return schemas.DiaryEntryResponse.model_validate(db_entry)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to create entry: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Gagal menyimpan entri: {str(e)}")
 
 
 @app.get("/entries/", response_model=List[schemas.DiaryEntryResponse])
-async def read_diary_entries_endpoint(
-    skip: int = 0, limit: int = 100, db: Session = Depends(get_db)
-):
-    entries = crud.get_diary_entries(db=db, skip=skip, limit=limit)
+async def list_diary_entries(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    """Menampilkan seluruh entri diary"""
+    entries = crud.get_diary_entries(db, skip=skip, limit=limit)
     return [schemas.DiaryEntryResponse.model_validate(e) for e in entries]
 
 
 @app.get("/entries/{entry_id}", response_model=schemas.DiaryEntryResponse)
-async def read_diary_entry_by_id_endpoint(entry_id: int, db: Session = Depends(get_db)):
-    db_entry = crud.get_diary_entry(db=db, entry_id=entry_id)
-    if db_entry is None:
-        raise HTTPException(status_code=404, detail="Entry not found")
-    return schemas.DiaryEntryResponse.model_validate(db_entry)
+async def get_diary_entry(entry_id: int, db: Session = Depends(get_db)):
+    """Menampilkan satu entri diary berdasarkan ID"""
+    entry = crud.get_diary_entry(db, entry_id)
+    if entry is None:
+        raise HTTPException(status_code=404, detail="Entri tidak ditemukan")
+    return schemas.DiaryEntryResponse.model_validate(entry)
 
+# -------------------------
+# ANALISIS EMOSI (AI)
+# -------------------------
 
 @app.post("/analyze/", response_model=schemas.AnalyzeResponse)
-def analyze_entry_endpoint(request: schemas.AnalyzeRequest):
-    """Analyze text using the OpenRouter API."""
-
+def analyze_entry(request: schemas.AnalyzeRequest):
+    """Menganalisis teks untuk mendeteksi suasana hati menggunakan OpenRouter"""
     try:
         result = openrouter.analyze_text(request.text)
         return {"analysis": result}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to analyze text: {e}")
+        raise HTTPException(status_code=500, detail=f"Gagal menganalisis teks: {e}")
 
+# -------------------------
+# ARTIKEL OTOMATIS (AI)
+# -------------------------
 
-@app.post(
-    "/articles/",
-    response_model=List[schemas.ArticleResponse],
-)
-def generate_articles_endpoint(request: schemas.ArticleRequest):
-    """Generate article ideas based on supplied text using OpenRouter."""
-
+@app.post("/articles/", response_model=List[schemas.ArticleResponse])
+def generate_articles(request: schemas.ArticleRequest):
+    """Menyarankan artikel berdasarkan isi jurnal atau emosi pengguna"""
     try:
         return generate_articles_with_openrouter(request.text)
-    except (NetworkError, InvalidResponseError) as e:
-        raise HTTPException(status_code=502, detail=str(e))
     except MissingAPIKeyError as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"API Key tidak ditemukan: {str(e)}")
+    except (NetworkError, InvalidResponseError) as e:
+        raise HTTPException(status_code=502, detail=f"OpenRouter error: {str(e)}")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to generate articles: {e}")
+        raise HTTPException(status_code=500, detail=f"Gagal menghasilkan artikel: {str(e)}")
 
+# -------------------------
+# CAPTION GAMBAR (AI)
+# -------------------------
 
 @app.post("/openrouter_caption/", response_model=schemas.OpenRouterCaptionResponse)
-async def caption_image_endpoint(request: schemas.OpenRouterCaptionRequest):
-    """Generate an image caption using OpenRouter."""
-
+async def caption_image(request: schemas.OpenRouterCaptionRequest):
+    """Menghasilkan deskripsi gambar menggunakan AI"""
     try:
         caption = await caption_image_with_openrouter(request.image_url)
         return {"caption": caption}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to caption image: {e}")
+        raise HTTPException(status_code=500, detail=f"Gagal membuat caption: {e}")
 
+# -------------------------
+# STATISTIK MOOD
+# -------------------------
 
 @app.get("/stats/", response_model=schemas.MoodStatsResponse)
-async def read_mood_stats_endpoint(db: Session = Depends(get_db)):
+async def get_mood_stats(db: Session = Depends(get_db)):
+    """Menghitung statistik suasana hati dari seluruh entri"""
     stats = crud.get_mood_stats(db)
     return {"stats": stats}
