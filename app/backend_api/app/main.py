@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from typing import List
 
 from . import crud
-from . import models, schemas
+from . import models, schemas, openrouter
 from .database import engine, get_db
 
 app = FastAPI(
@@ -208,6 +208,17 @@ def caption_image_endpoint(request: schemas.OpenRouterCaptionRequest):
         return {"caption": caption}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to caption image: {e}")
+
+
+@app.post("/openrouter_analyze/", response_model=schemas.AnalyzeResponse)
+def openrouter_analyze_endpoint(request: schemas.AnalyzeRequest):
+    """Analyze text using the OpenRouter API."""
+
+    try:
+        result = openrouter.analyze_text(request.text)
+        return {"analysis": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to analyze text: {e}")
 
 
 @app.get("/stats/", response_model=schemas.MoodStatsResponse)
