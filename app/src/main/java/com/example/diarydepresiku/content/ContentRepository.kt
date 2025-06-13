@@ -3,9 +3,6 @@ package com.example.diarydepresiku.content
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import com.example.diarydepresiku.R
 import com.example.diarydepresiku.content.ArticleReaction
 import com.example.diarydepresiku.content.ArticleReactionDao
 import kotlinx.coroutines.Dispatchers
@@ -65,7 +62,7 @@ open class ContentRepository(
             }
             val cached = dao.getAllArticles().map { it.toModel() }
             if (cached.isNotEmpty()) return@withContext cached
-            return@withContext loadDefaultArticles()
+            return@withContext emptyList()
         }
 
     suspend fun recordReaction(url: String, reaction: String) {
@@ -73,10 +70,4 @@ open class ContentRepository(
         withContext(Dispatchers.IO) { reactionDao.insertReaction(entity) }
     }
 
-    private fun loadDefaultArticles(): List<EducationalArticle> {
-        val input = context.resources.openRawResource(R.raw.default_articles)
-        val json = input.bufferedReader().use { it.readText() }
-        val type = object : TypeToken<List<EducationalArticle>>() {}.type
-        return Gson().fromJson(json, type)
-    }
 }
