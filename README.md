@@ -110,12 +110,11 @@ pip install -r requirements.txt
 
 ### Environment Variables
 
-Backend membutuhkan `GEMINI_API_KEY` dan `OPENROUTER_API_KEY`. Simpan keduanya di
+Backend membutuhkan `OPENROUTER_API_KEY`. Simpan variabel ini di
 file `.env` lalu muat sebelum menjalankan server:
 
 ```bash
-echo "GEMINI_API_KEY=your-gemini-api-key" > .env
-echo "OPENROUTER_API_KEY=your-openrouter-api-key" >> .env
+echo "OPENROUTER_API_KEY=your-openrouter-api-key" > .env
 set -a && source .env && set +a
 uvicorn app.main:app --reload
 ```
@@ -156,7 +155,6 @@ Tambahkan entri berikut:
 
 ```properties
 NEWS_API_KEY=your-news-api-key
-GEMINI_API_KEY=your-gemini-api-key
 OPENROUTER_API_KEY=your-openrouter-api-key
 ```
 
@@ -165,7 +163,7 @@ terikut saat commit.
 
 ## Deployment di Render
 
-Blueprint `render.yaml` tidak menyertakan kunci API. Tambahkan `GEMINI_API_KEY` dan, bila diperlukan, `OPENROUTER_API_KEY` pada menu **Environment** sebelum melakukan deploy.
+Blueprint `render.yaml` tidak menyertakan kunci API. Tambahkan `OPENROUTER_API_KEY` pada menu **Environment** sebelum melakukan deploy.
 ## Kontribusi
 Kami menyambut kontribusi dari komunitas. Silakan fork repositori ini, buat branch baru, dan kirim pull request. Pedoman kontribusi tersedia di CONTRIBUTING.md.
 

@@ -4,9 +4,8 @@ from sqlalchemy.orm import Session
 from typing import List
 
 from .ai_utils import (
-    analyze_with_gemini,
     caption_image_with_openrouter,
-    generate_articles_with_gemini,
+    generate_articles_with_openrouter,
 )
 
 from . import crud
@@ -68,24 +67,26 @@ async def read_diary_entry_by_id_endpoint(entry_id: int, db: Session = Depends(g
     return schemas.DiaryEntryResponse.model_validate(db_entry)
 
 
-@app.post("/analyze", response_model=schemas.AnalyzeResponse)
+@app.post("/analyze/", response_model=schemas.AnalyzeResponse)
 def analyze_entry_endpoint(request: schemas.AnalyzeRequest):
+    """Analyze text using the OpenRouter API."""
+
     try:
-        analysis_result = analyze_with_gemini(request.text)
-        return {"analysis": analysis_result}
+        result = openrouter.analyze_text(request.text)
+        return {"analysis": result}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to analyze text: {e}")
 
 
 @app.post(
-    "/gemini_articles/",
-    response_model=List[schemas.GeminiArticleResponse],
+    "/articles/",
+    response_model=List[schemas.ArticleResponse],
 )
-def generate_articles_endpoint(request: schemas.GeminiArticleRequest):
-    """Generate article ideas based on supplied text."""
+def generate_articles_endpoint(request: schemas.ArticleRequest):
+    """Generate article ideas based on supplied text using OpenRouter."""
 
     try:
-        return generate_articles_with_gemini(request.text)
+        return generate_articles_with_openrouter(request.text)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to generate articles: {e}")
 
@@ -101,15 +102,6 @@ async def caption_image_endpoint(request: schemas.OpenRouterCaptionRequest):
         raise HTTPException(status_code=500, detail=f"Failed to caption image: {e}")
 
 
-@app.post("/openrouter_analyze/", response_model=schemas.AnalyzeResponse)
-def openrouter_analyze_endpoint(request: schemas.AnalyzeRequest):
-    """Analyze text using the OpenRouter API."""
-
-    try:
-        result = openrouter.analyze_text(request.text)
-        return {"analysis": result}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to analyze text: {e}")
 
 
 @app.get("/stats/", response_model=schemas.MoodStatsResponse)
