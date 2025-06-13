@@ -107,6 +107,7 @@ cd diary-depresiku
 cd app/backend_api
 pip install -r requirements.txt
 export GEMINI_API_KEY=your-gemini-api-key
+export OPENROUTER_API_KEY=your-openrouter-api-key
 uvicorn app.main:app --reload
 ```
 
@@ -115,6 +116,7 @@ menjalankan backend:
 
 ```bash
 echo "GEMINI_API_KEY=your-gemini-api-key" > .env
+echo "OPENROUTER_API_KEY=your-openrouter-api-key" >> .env
 set -a && source .env && set +a
 uvicorn app.main:app --reload
 ```
@@ -156,6 +158,7 @@ Tambahkan entri berikut:
 ```properties
 NEWS_API_KEY=your-news-api-key
 GEMINI_API_KEY=your-gemini-api-key
+OPENROUTER_API_KEY=your-openrouter-api-key
 ```
 
 File `local.properties` sudah ada di `.gitignore`, sehingga kunci rahasia tidak
@@ -164,6 +167,7 @@ terikut saat commit.
 ## Deployment di Render
 
 Blueprint `render.yaml` tidak menyertakan nilai `GEMINI_API_KEY`. Saat menyiapkan layanan di Render, buka menu **Environment** dan tambahkan variabel ini dengan kunci Gemini Anda. Setelah disimpan, deploy blueprint seperti biasa.
+Anda juga perlu menambahkan `OPENROUTER_API_KEY` bila ingin menggunakan integrasi OpenRouter.
 ## Kontribusi
 Kami menyambut kontribusi dari komunitas. Silakan fork repositori ini, buat branch baru, dan kirim pull request. Pedoman kontribusi tersedia di CONTRIBUTING.md.
 
