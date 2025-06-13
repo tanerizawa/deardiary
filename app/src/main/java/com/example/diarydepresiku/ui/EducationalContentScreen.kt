@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -20,12 +18,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.diarydepresiku.ContentViewModel
 import com.example.diarydepresiku.content.EducationalArticle
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 @Composable
 fun EducationalContentScreen(
     viewModel: ContentViewModel,
     modifier: Modifier = Modifier
 ) {
-    ArticleList(viewModel = viewModel, modifier = modifier)
+    ArticleList(
+        viewModel = viewModel,
+        modifier = modifier.verticalScroll(rememberScrollState())
+    )
 }
 
 @Composable
@@ -38,12 +41,12 @@ fun ArticleList(
     val context = LocalContext.current
     var openedUrl by remember { mutableStateOf<String?>(null) }
 
-    LazyColumn(
+    Column(
         modifier = modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        items(articles) { article ->
+        articles.forEach { article ->
             val highlighted = highlightMood != null && (
                 article.title?.contains(highlightMood, ignoreCase = true) == true ||
                     article.description?.contains(highlightMood, ignoreCase = true) == true
