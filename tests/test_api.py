@@ -150,3 +150,28 @@ def test_openrouter_caption_error(client, monkeypatch):
         json={"image_url": "http://example.com/img.jpg"},
     )
     assert resp.status_code == 500
+
+
+def test_openrouter_analyze(client, monkeypatch):
+    class MockResp:
+        def raise_for_status(self):
+            pass
+
+        def json(self):
+            return {"choices": [{"message": {"content": "Positif"}}]}
+
+    monkeypatch.setenv("OPENROUTER_API_KEY", "dummy")
+    monkeypatch.setattr("app.openrouter.requests.post", lambda *a, **k: MockResp())
+    resp = client.post("/openrouter_analyze/", json={"text": "hello"})
+    assert resp.status_code == 200
+    assert resp.json() == {"analysis": "Positif"}
+
+
+def test_openrouter_analyze_error(client, monkeypatch):
+    def raise_exc(*args, **kwargs):
+        raise requests.RequestException("bad")
+
+    monkeypatch.setenv("OPENROUTER_API_KEY", "dummy")
+    monkeypatch.setattr("app.openrouter.requests.post", raise_exc)
+    resp = client.post("/openrouter_analyze/", json={"text": "hello"})
+    assert resp.status_code == 500
