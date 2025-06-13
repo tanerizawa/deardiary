@@ -1,9 +1,13 @@
 import os
+import logging
 from dotenv import load_dotenv
 from openai import OpenAI
 
 # Memuat variabel dari file .env ke dalam environment
 load_dotenv()
+
+logger = logging.getLogger(__name__)
+
 
 def get_openrouter_client() -> OpenAI:
     """
@@ -12,19 +16,15 @@ def get_openrouter_client() -> OpenAI:
     """
     api_key = os.getenv("OPENROUTER_API_KEY")
 
-    # --- BLOK DEBUGGING ---
-    # Kode berikut akan mencetak nilai API Key yang terbaca ke terminal Anda.
-    # Ini membantu memastikan bahwa file .env Anda dimuat dengan benar.
-    print("--- Memeriksa Kunci API OpenRouter ---")
     if api_key:
-        print(f"DEBUG: Kunci API ditemukan. Panjang: {len(api_key)} karakter.")
-        # Untuk keamanan, kita hanya akan menampilkan beberapa karakter pertama dan terakhir
-        print(f"DEBUG: Kunci dimulai dengan '{api_key[:4]}' dan diakhiri dengan '{api_key[-4:]}'.")
+        logger.debug(
+            "OpenRouter API key loaded (length: %d, prefix: %s, suffix: %s)",
+            len(api_key),
+            api_key[:4],
+            api_key[-4:],
+        )
     else:
-        # Pesan ini akan muncul jika os.getenv() tidak menemukan variabelnya.
-        print("DEBUG: KESALAHAN! Variabel OPENROUTER_API_KEY tidak ditemukan di environment.")
-    print("------------------------------------")
-    # --- AKHIR BLOK DEBUGGING ---
+        logger.debug("OPENROUTER_API_KEY not found in environment")
 
     # Logika ini tetap sama. Jika kunci tidak ada, program akan berhenti.
     # Ini adalah pengaman jika terjadi kesalahan.
@@ -35,7 +35,4 @@ def get_openrouter_client() -> OpenAI:
         )
 
     # Mengembalikan klien yang sudah diinisialisasi
-    return OpenAI(
-        base_url="https://openrouter.ai/api/v1",
-        api_key=api_key
-    )
+    return OpenAI(base_url="https://openrouter.ai/api/v1", api_key=api_key)

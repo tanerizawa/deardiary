@@ -1,5 +1,6 @@
 from .openrouter_client import get_openrouter_client
-import json
+import logging
+
 
 def analyze_text(text: str) -> str:
     """Analyze text sentiment using OpenRouter."""
@@ -30,7 +31,5 @@ def analyze_text(text: str) -> str:
 
     except Exception as e:
         # Menangkap error lain dari OpenRouter API atau Python
-        print(f"ERROR: Kesalahan API OpenRouter atau pemrosesan: {e}")
-        # Kembalikan pesan error umum, agar klien tidak mendapatkan detail internal
-        return "Gagal menganalisis sentimen: Terjadi kesalahan tidak terduga."
-
+        logging.error("ERROR: Kesalahan API OpenRouter atau pemrosesan: %s", e)
+        raise RuntimeError("Gagal menganalisis sentimen") from e
