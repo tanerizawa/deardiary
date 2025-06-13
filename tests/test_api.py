@@ -115,7 +115,27 @@ def test_openrouter_articles_error(client, monkeypatch):
     monkeypatch.setenv("OPENROUTER_API_KEY", "dummy")
     monkeypatch.setattr("app.ai_utils.requests.post", raise_exc)
     resp = client.post("/articles/", json={"text": "hi"})
+    assert resp.status_code == 502
+
+
+def test_openrouter_articles_missing_key(client, monkeypatch):
+    monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
+    resp = client.post("/articles/", json={"text": "hi"})
     assert resp.status_code == 500
+
+
+def test_openrouter_articles_bad_json(client, monkeypatch):
+    class BadResp:
+        def raise_for_status(self):
+            pass
+
+        def json(self):
+            return {"choices": [{"message": {"content": "not-json"}}]}
+
+    monkeypatch.setenv("OPENROUTER_API_KEY", "dummy")
+    monkeypatch.setattr("app.ai_utils.requests.post", lambda *a, **k: BadResp())
+    resp = client.post("/articles/", json={"text": "hi"})
+    assert resp.status_code == 502
 
 
 def test_openrouter_caption(client, monkeypatch):
