@@ -6,6 +6,9 @@ from typing import List
 from .ai_utils import (
     caption_image_with_openrouter,
     generate_articles_with_openrouter,
+    MissingAPIKeyError,
+    NetworkError,
+    InvalidResponseError,
 )
 
 from . import crud
@@ -87,6 +90,10 @@ def generate_articles_endpoint(request: schemas.ArticleRequest):
 
     try:
         return generate_articles_with_openrouter(request.text)
+    except (NetworkError, InvalidResponseError) as e:
+        raise HTTPException(status_code=502, detail=str(e))
+    except MissingAPIKeyError as e:
+        raise HTTPException(status_code=500, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to generate articles: {e}")
 

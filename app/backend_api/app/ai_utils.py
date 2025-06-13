@@ -1,8 +1,21 @@
 import os
 import json
+import logging
 import requests
 import httpx
 from typing import List
+
+
+class MissingAPIKeyError(RuntimeError):
+    """Raised when the OPENROUTER_API_KEY is not configured."""
+
+
+class NetworkError(RuntimeError):
+    """Raised when a network error occurs talking to OpenRouter."""
+
+
+class InvalidResponseError(RuntimeError):
+    """Raised when OpenRouter returns an invalid JSON payload."""
 
 from . import schemas
 
@@ -12,7 +25,7 @@ async def caption_image_with_openrouter(image_url: str) -> str:
 
     api_key = os.getenv("OPENROUTER_API_KEY")
     if not api_key:
-        raise RuntimeError("Missing OPENROUTER_API_KEY")
+        raise MissingAPIKeyError("Missing OPENROUTER_API_KEY")
 
     payload = {
         "model": "google/gemini-2.0-flash-exp:free",
@@ -51,7 +64,7 @@ def generate_articles_with_openrouter(text: str) -> List[schemas.ArticleResponse
 
     api_key = os.getenv("OPENROUTER_API_KEY")
     if not api_key:
-        raise RuntimeError("Missing OPENROUTER_API_KEY")
+        raise MissingAPIKeyError("Missing OPENROUTER_API_KEY")
 
     payload = {
         "model": "google/gemini-2.0-flash-exp:free",
@@ -80,9 +93,20 @@ def generate_articles_with_openrouter(text: str) -> List[schemas.ArticleResponse
             timeout=10,
         )
         response.raise_for_status()
+    except requests.RequestException as e:
+        raise NetworkError(f"Error communicating with OpenRouter: {e}") from e
+
+    try:
         data = response.json()
         text_resp = data["choices"][0]["message"]["content"]
-        articles = json.loads(text_resp)
+        try:
+            articles = json.loads(text_resp)
+        except json.JSONDecodeError as e:
+            logging.error("OpenRouter raw response: %s", text_resp)
+            raise InvalidResponseError(
+                "Invalid JSON in OpenRouter response"
+            ) from e
         return [schemas.ArticleResponse(**a) for a in articles]
     except Exception as e:
-        raise RuntimeError(f"Error from OpenRouter API: {e}")
+        raise InvalidResponseError(f"Malformed response from OpenRouter: {e}") from e
+
