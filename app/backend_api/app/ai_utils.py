@@ -1,6 +1,7 @@
 import os
 import json
 import requests
+import httpx
 from typing import List
 
 from . import schemas
@@ -43,7 +44,7 @@ def analyze_with_gemini(text: str) -> str:
         raise RuntimeError(f"Error from Gemini API: {e}")
 
 
-def caption_image_with_openrouter(image_url: str) -> str:
+async def caption_image_with_openrouter(image_url: str) -> str:
     """Return a text description of the image using OpenRouter."""
 
     api_key = os.getenv("OPENROUTER_API_KEY")
@@ -69,12 +70,12 @@ def caption_image_with_openrouter(image_url: str) -> str:
     }
 
     try:
-        response = requests.post(
-            "https://openrouter.ai/api/v1/chat/completions",
-            headers=headers,
-            json=payload,
-            timeout=10,
-        )
+        async with httpx.AsyncClient(timeout=10) as client:
+            response = await client.post(
+                "https://openrouter.ai/api/v1/chat/completions",
+                headers=headers,
+                json=payload,
+            )
         response.raise_for_status()
         data = response.json()
         return data["choices"][0]["message"]["content"]
@@ -116,4 +117,3 @@ def generate_articles_with_gemini(text: str) -> List[schemas.GeminiArticleRespon
         return [schemas.GeminiArticleResponse(**a) for a in articles]
     except Exception as e:
         raise RuntimeError(f"Error from Gemini API: {e}")
-

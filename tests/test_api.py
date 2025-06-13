@@ -6,6 +6,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 import pytest
 import requests
+import httpx
 
 os.environ["SQLALCHEMY_DATABASE_URL"] = "sqlite:///:memory:"
 sys.path.append("app/backend_api")
@@ -129,8 +130,21 @@ def test_openrouter_caption(client, monkeypatch):
         def json(self):
             return {"choices": [{"message": {"content": "A boardwalk"}}]}
 
+    class MockAsyncClient:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc, tb):
+            pass
+
+        async def post(self, *args, **kwargs):
+            return MockResp()
+
     monkeypatch.setenv("OPENROUTER_API_KEY", "dummy")
-    monkeypatch.setattr("app.ai_utils.requests.post", lambda *a, **k: MockResp())
+    monkeypatch.setattr("app.ai_utils.httpx.AsyncClient", MockAsyncClient)
     resp = client.post(
         "/openrouter_caption/",
         json={"image_url": "http://example.com/img.jpg"},
@@ -140,11 +154,21 @@ def test_openrouter_caption(client, monkeypatch):
 
 
 def test_openrouter_caption_error(client, monkeypatch):
-    def raise_exc(*args, **kwargs):
-        raise requests.RequestException("bad")
+    class MockAsyncClient:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc, tb):
+            pass
+
+        async def post(self, *args, **kwargs):
+            raise httpx.RequestError("bad")
 
     monkeypatch.setenv("OPENROUTER_API_KEY", "dummy")
-    monkeypatch.setattr("app.ai_utils.requests.post", raise_exc)
+    monkeypatch.setattr("app.ai_utils.httpx.AsyncClient", MockAsyncClient)
     resp = client.post(
         "/openrouter_caption/",
         json={"image_url": "http://example.com/img.jpg"},
