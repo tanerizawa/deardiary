@@ -1,8 +1,7 @@
+import asyncio
 import os
 import json
 import logging
-import requests
-import httpx
 from typing import List
 
 
@@ -17,15 +16,18 @@ class NetworkError(RuntimeError):
 class InvalidResponseError(RuntimeError):
     """Raised when OpenRouter returns an invalid JSON payload."""
 
+
 from . import schemas
+from .openrouter_client import get_openrouter_client
 
 
 async def caption_image_with_openrouter(image_url: str) -> str:
     """Return a text description of the image using OpenRouter."""
 
-    api_key = os.getenv("OPENROUTER_API_KEY")
-    if not api_key:
-        raise MissingAPIKeyError("Missing OPENROUTER_API_KEY")
+    try:
+        client = get_openrouter_client()
+    except RuntimeError as e:
+        raise MissingAPIKeyError(str(e)) from e
 
     payload = {
         "model": "google/gemini-2.0-flash-exp:free",
@@ -40,21 +42,12 @@ async def caption_image_with_openrouter(image_url: str) -> str:
         ],
     }
 
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json",
-    }
-
     try:
-        async with httpx.AsyncClient(timeout=10) as client:
-            response = await client.post(
-                "https://openrouter.ai/api/v1/chat/completions",
-                headers=headers,
-                json=payload,
-            )
-        response.raise_for_status()
-        data = response.json()
-        return data["choices"][0]["message"]["content"]
+        data = await asyncio.to_thread(
+            client.chat.completions.create,
+            **payload,
+        )
+        return data.choices[0].message.content
     except Exception as e:
         raise RuntimeError(f"Error from OpenRouter API: {e}")
 
@@ -62,9 +55,10 @@ async def caption_image_with_openrouter(image_url: str) -> str:
 def generate_articles_with_openrouter(text: str) -> List[schemas.ArticleResponse]:
     """Request OpenRouter API to create article titles and summaries."""
 
-    api_key = os.getenv("OPENROUTER_API_KEY")
-    if not api_key:
-        raise MissingAPIKeyError("Missing OPENROUTER_API_KEY")
+    try:
+        client = get_openrouter_client()
+    except RuntimeError as e:
+        raise MissingAPIKeyError(str(e)) from e
 
     payload = {
         "model": "google/gemini-2.0-flash-exp:free",
@@ -80,33 +74,14 @@ def generate_articles_with_openrouter(text: str) -> List[schemas.ArticleResponse
         ],
     }
 
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json",
-    }
-
     try:
-        response = requests.post(
-            "https://openrouter.ai/api/v1/chat/completions",
-            headers=headers,
-            json=payload,
-            timeout=10,
-        )
-        response.raise_for_status()
-    except requests.RequestException as e:
-        raise NetworkError(f"Error communicating with OpenRouter: {e}") from e
-
-    try:
-        data = response.json()
-        text_resp = data["choices"][0]["message"]["content"]
+        data = client.chat.completions.create(**payload)
+        text_resp = data.choices[0].message.content
         try:
             articles = json.loads(text_resp)
         except json.JSONDecodeError as e:
             logging.error("OpenRouter raw response: %s", text_resp)
-            raise InvalidResponseError(
-                "Invalid JSON in OpenRouter response"
-            ) from e
+            raise InvalidResponseError("Invalid JSON in OpenRouter response") from e
         return [schemas.ArticleResponse(**a) for a in articles]
     except Exception as e:
         raise InvalidResponseError(f"Malformed response from OpenRouter: {e}") from e
-

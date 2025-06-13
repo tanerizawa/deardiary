@@ -108,10 +108,14 @@ cd app/backend_api
 pip install -r requirements.txt
 ```
 
+File `requirements.txt` menyertakan paket `openai` yang digunakan helper
+`get_openrouter_client()` untuk terhubung ke layanan OpenRouter.
+
 ### Environment Variables
 
-Backend membutuhkan `OPENROUTER_API_KEY`. Simpan variabel ini di
-file `.env` lalu muat sebelum menjalankan server:
+Backend membutuhkan `OPENROUTER_API_KEY` untuk autentikasi ketika
+`get_openrouter_client()` memanggil API. Simpan variabel ini di file
+`.env` lalu muat sebelum menjalankan server:
 
 ```bash
 echo "OPENROUTER_API_KEY=your-openrouter-api-key" > .env
