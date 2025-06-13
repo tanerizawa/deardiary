@@ -17,7 +17,7 @@ import com.example.diarydepresiku.AuthRequest
 import com.example.diarydepresiku.TokenResponse
 import com.example.diarydepresiku.AnalyzeRequest
 import com.example.diarydepresiku.AnalyzeResponse
-import com.example.diarydepresiku.GeminiArticlesRequest
+import com.example.diarydepresiku.ArticlesRequest
 import com.example.diarydepresiku.content.EducationalArticle
 
 class FakeDiaryDao : DiaryDao {
@@ -50,7 +50,7 @@ class FakeDiaryApi : DiaryApi {
     override suspend fun login(request: AuthRequest): Response<TokenResponse> = Response.success(TokenResponse("token"))
     override suspend fun analyzeEntry(request: AnalyzeRequest): Response<AnalyzeResponse> =
         Response.success(AnalyzeResponse("ok"))
-    override suspend fun geminiArticles(request: GeminiArticlesRequest): Response<List<EducationalArticle>> =
+    override suspend fun openrouterArticles(request: ArticlesRequest): Response<List<EducationalArticle>> =
         Response.success(emptyList())
 }
 
@@ -66,7 +66,7 @@ class FailingDiaryApi : DiaryApi {
     override suspend fun login(request: AuthRequest): Response<TokenResponse> = Response.success(TokenResponse("token"))
     override suspend fun analyzeEntry(request: AnalyzeRequest): Response<AnalyzeResponse> =
         Response.success(AnalyzeResponse(""))
-    override suspend fun geminiArticles(request: GeminiArticlesRequest): Response<List<EducationalArticle>> =
+    override suspend fun openrouterArticles(request: ArticlesRequest): Response<List<EducationalArticle>> =
         Response.error(500, okhttp3.ResponseBody.create(null, ""))
 }
 

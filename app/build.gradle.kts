@@ -34,7 +34,6 @@ android {
         buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8000/\"")
         // API keys loaded from local.properties or Gradle properties
         buildConfigField("String", "NEWS_API_KEY", "\"${secret("NEWS_API_KEY") ?: ""}\"")
-        buildConfigField("String", "GEMINI_API_KEY", "\"${secret("GEMINI_API_KEY") ?: ""}\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

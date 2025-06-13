@@ -55,7 +55,7 @@ data class AnalyzeResponse(
     @SerializedName("analysis") val analysis: String
 )
 
-data class GeminiArticlesRequest(
+data class ArticlesRequest(
     @SerializedName("text") val text: String
 )
 
@@ -87,11 +87,11 @@ interface DiaryApi {
     @POST("login/")
     suspend fun login(@Body request: AuthRequest): Response<TokenResponse>
 
-    @POST("analyze")
+    @POST("analyze/")
     suspend fun analyzeEntry(@Body request: AnalyzeRequest): Response<AnalyzeResponse>
 
-    @POST("gemini_articles/")
-    suspend fun geminiArticles(@Body request: GeminiArticlesRequest): Response<List<com.example.diarydepresiku.content.EducationalArticle>>
+    @POST("articles/")
+    suspend fun openrouterArticles(@Body request: ArticlesRequest): Response<List<com.example.diarydepresiku.content.EducationalArticle>>
 
     // (Opsional) Endpoint lain dapat didefinisikan di sini, misalnya:
     // @GET("entries/")

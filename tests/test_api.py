@@ -80,45 +80,41 @@ def test_analyze_entry(client, monkeypatch):
             pass
 
         def json(self):
-            return {"candidates": [{"content": {"parts": [{"text": "Positif"}]}}]}
+            return {"choices": [{"message": {"content": "Positif"}}]}
 
-    monkeypatch.setenv("GEMINI_API_KEY", "dummy")
-    monkeypatch.setattr("app.ai_utils.requests.post", lambda *a, **k: MockResp())
-    resp = client.post("/analyze", json={"text": "saya senang"})
+    monkeypatch.setenv("OPENROUTER_API_KEY", "dummy")
+    monkeypatch.setattr("app.openrouter.requests.post", lambda *a, **k: MockResp())
+    resp = client.post("/analyze/", json={"text": "saya senang"})
     assert resp.status_code == 200
-    assert resp.json()["analysis"] == "Mood terdeteksi positif"
+    assert resp.json()["analysis"] == "Positif"
 
 
-def test_gemini_articles(client, monkeypatch):
+def test_openrouter_articles(client, monkeypatch):
     class MockResp:
         def raise_for_status(self):
             pass
 
         def json(self):
             return {
-                "candidates": [
-                    {
-                        "content": {
-                            "parts": [{"text": '[{"title": "A", "summary": "B"}]'}]
-                        }
-                    }
+                "choices": [
+                    {"message": {"content": '[{"title": "A", "summary": "B"}]'}}
                 ]
             }
 
-    monkeypatch.setenv("GEMINI_API_KEY", "dummy")
+    monkeypatch.setenv("OPENROUTER_API_KEY", "dummy")
     monkeypatch.setattr("app.ai_utils.requests.post", lambda *a, **k: MockResp())
-    resp = client.post("/gemini_articles/", json={"text": "hi"})
+    resp = client.post("/articles/", json={"text": "hi"})
     assert resp.status_code == 200
     assert resp.json() == [{"title": "A", "summary": "B"}]
 
 
-def test_gemini_articles_error(client, monkeypatch):
+def test_openrouter_articles_error(client, monkeypatch):
     def raise_exc(*args, **kwargs):
         raise requests.RequestException("bad")
 
-    monkeypatch.setenv("GEMINI_API_KEY", "dummy")
+    monkeypatch.setenv("OPENROUTER_API_KEY", "dummy")
     monkeypatch.setattr("app.ai_utils.requests.post", raise_exc)
-    resp = client.post("/gemini_articles/", json={"text": "hi"})
+    resp = client.post("/articles/", json={"text": "hi"})
     assert resp.status_code == 500
 
 
@@ -186,7 +182,7 @@ def test_openrouter_analyze(client, monkeypatch):
 
     monkeypatch.setenv("OPENROUTER_API_KEY", "dummy")
     monkeypatch.setattr("app.openrouter.requests.post", lambda *a, **k: MockResp())
-    resp = client.post("/openrouter_analyze/", json={"text": "hello"})
+    resp = client.post("/analyze/", json={"text": "hello"})
     assert resp.status_code == 200
     assert resp.json() == {"analysis": "Positif"}
 
@@ -197,5 +193,5 @@ def test_openrouter_analyze_error(client, monkeypatch):
 
     monkeypatch.setenv("OPENROUTER_API_KEY", "dummy")
     monkeypatch.setattr("app.openrouter.requests.post", raise_exc)
-    resp = client.post("/openrouter_analyze/", json={"text": "hello"})
+    resp = client.post("/analyze/", json={"text": "hello"})
     assert resp.status_code == 500

@@ -68,13 +68,13 @@ class AnalyzeResponse(BaseModel):
     analysis: str  # Hasil analisis (misal: "Mood terdeteksi positif")
 
 
-class GeminiArticleRequest(BaseModel):
+class ArticleRequest(BaseModel):
     """Request body for generating article ideas."""
 
     text: str = Field(..., min_length=1)
 
 
-class GeminiArticleResponse(BaseModel):
+class ArticleResponse(BaseModel):
     """Response item containing generated article data."""
 
     title: str

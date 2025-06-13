@@ -34,11 +34,11 @@ open class ContentRepository(
             if (isNetworkAvailable()) {
                 if (!query.isNullOrBlank()) {
                     try {
-                        val gemini = diaryApi.geminiArticles(
-                            com.example.diarydepresiku.GeminiArticlesRequest(query)
+                        val aiResp = diaryApi.openrouterArticles(
+                            com.example.diarydepresiku.ArticlesRequest(query)
                         )
-                        if (gemini.isSuccessful) {
-                            val articles = gemini.body() ?: emptyList()
+                        if (aiResp.isSuccessful) {
+                            val articles = aiResp.body() ?: emptyList()
                             dao.clearAll()
                             dao.insertArticles(articles.map { it.toEntity() })
                             return@withContext articles
