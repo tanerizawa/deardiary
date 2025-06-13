@@ -2,6 +2,8 @@
 from fastapi import FastAPI, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
+from dotenv import load_dotenv
+import os
 
 from .ai_utils import (
     caption_image_with_openrouter,

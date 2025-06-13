@@ -1,36 +1,66 @@
 import asyncio
-import os
 import json
 import logging
+import re
 from typing import List
 
+from . import schemas
+from .openrouter_client import get_openrouter_client
+
+
+# === Custom Error Classes ===
 
 class MissingAPIKeyError(RuntimeError):
     """Raised when the OPENROUTER_API_KEY is not configured."""
 
 
 class NetworkError(RuntimeError):
-    """Raised when a network error occurs talking to OpenRouter."""
+    """Raised when a network error occurs while communicating with OpenRouter."""
 
 
 class InvalidResponseError(RuntimeError):
-    """Raised when OpenRouter returns an invalid JSON payload."""
+    """Raised when OpenRouter returns an invalid or unexpected response."""
 
 
-from . import schemas
-from .openrouter_client import get_openrouter_client
+# === Helper Functions ===
 
+def extract_json_from_markdown(text: str) -> str:
+    """
+    Extracts JSON content from a markdown-style block formatted with triple backticks.
+
+    Example expected input:
+    ```json
+    [
+        {"title": "...", "summary": "..."},
+        ...
+    ]
+    ```
+    """
+    match = re.search(r"```json\s*(.*?)\s*```", text, re.DOTALL)
+    if match:
+        return match.group(1).strip()
+    raise InvalidResponseError("Tidak ditemukan blok JSON dalam respons OpenRouter.")
+
+
+# === OpenRouter Functionalities ===
 
 async def caption_image_with_openrouter(image_url: str) -> str:
-    """Return a text description of the image using OpenRouter."""
+    """
+    Generates a caption for an image using the OpenRouter API.
 
+    Args:
+        image_url (str): The URL of the image to describe.
+
+    Returns:
+        str: A textual description of the image.
+    """
     try:
         client = get_openrouter_client()
     except RuntimeError as e:
         raise MissingAPIKeyError(str(e)) from e
 
     payload = {
-        "model": "google/gemini-2.0-flash-exp:free",
+        "model": "deepseek/deepseek-chat-v3-0324:free",
         "messages": [
             {
                 "role": "user",
@@ -43,32 +73,37 @@ async def caption_image_with_openrouter(image_url: str) -> str:
     }
 
     try:
-        data = await asyncio.to_thread(
-            client.chat.completions.create,
-            **payload,
-        )
+        data = await asyncio.to_thread(client.chat.completions.create, **payload)
         return data.choices[0].message.content
     except Exception as e:
         raise RuntimeError(f"Error from OpenRouter API: {e}")
 
 
 def generate_articles_with_openrouter(text: str) -> List[schemas.ArticleResponse]:
-    """Request OpenRouter API to create article titles and summaries."""
+    """
+    Requests the OpenRouter API to generate three article titles and summaries in JSON format.
 
+    Args:
+        text (str): The input text or topic to base the articles on.
+
+    Returns:
+        List[schemas.ArticleResponse]: List of parsed article data.
+    """
     try:
         client = get_openrouter_client()
     except RuntimeError as e:
         raise MissingAPIKeyError(str(e)) from e
 
     payload = {
-        "model": "google/gemini-2.0-flash-exp:free",
+        "model": "deepseek/deepseek-chat-v3-0324:free",
         "messages": [
             {
                 "role": "user",
                 "content": (
-                    "Buat tiga judul artikel beserta ringkasan singkat dalam format JSON "
-                    "[{'title': 'Judul', 'summary': 'Ringkasan'}] berdasarkan teks berikut.\n"
-                    + text
+                        "Buat tiga judul artikel beserta ringkasan singkat dalam format JSON "
+                        "[{'title': 'Judul', 'summary': 'Ringkasan'}] tanpa tambahan penjelasan. "
+                        "Balas hanya dengan JSON.\n"
+                        + text
                 ),
             }
         ],
@@ -77,11 +112,15 @@ def generate_articles_with_openrouter(text: str) -> List[schemas.ArticleResponse
     try:
         data = client.chat.completions.create(**payload)
         text_resp = data.choices[0].message.content
+
         try:
-            articles = json.loads(text_resp)
-        except json.JSONDecodeError as e:
+            json_str = extract_json_from_markdown(text_resp)
+            articles = json.loads(json_str)
+        except Exception as e:
             logging.error("OpenRouter raw response: %s", text_resp)
             raise InvalidResponseError("Invalid JSON in OpenRouter response") from e
+
         return [schemas.ArticleResponse(**a) for a in articles]
+
     except Exception as e:
         raise InvalidResponseError(f"Malformed response from OpenRouter: {e}") from e

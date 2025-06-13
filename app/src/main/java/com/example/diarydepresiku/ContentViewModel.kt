@@ -48,7 +48,7 @@ class ContentViewModel(
                 ?: diaryViewModel?.moodCounts?.value?.maxByOrNull { it.value }?.key
 
             val allArticles = repository.getArticles(
-                apiKey = BuildConfig.NEWS_API_KEY,
+                apiKey = BuildConfig.OPENROUTER_API_KEY,
                 query = mood
             )
 
