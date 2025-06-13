@@ -22,8 +22,6 @@ app = FastAPI(
 models.Base.metadata.create_all(bind=engine)
 
 
-
-
 @app.post("/register/", status_code=status.HTTP_201_CREATED)
 async def register_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     if crud.get_user_by_email(db, user.email):
@@ -93,11 +91,11 @@ def generate_articles_endpoint(request: schemas.GeminiArticleRequest):
 
 
 @app.post("/openrouter_caption/", response_model=schemas.OpenRouterCaptionResponse)
-def caption_image_endpoint(request: schemas.OpenRouterCaptionRequest):
+async def caption_image_endpoint(request: schemas.OpenRouterCaptionRequest):
     """Generate an image caption using OpenRouter."""
 
     try:
-        caption = caption_image_with_openrouter(request.image_url)
+        caption = await caption_image_with_openrouter(request.image_url)
         return {"caption": caption}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to caption image: {e}")
