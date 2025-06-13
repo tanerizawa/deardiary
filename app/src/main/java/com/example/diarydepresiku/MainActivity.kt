@@ -11,6 +11,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.*
 
@@ -91,8 +92,8 @@ class MainActivity : ComponentActivity() {
                                         launchSingleTop = true
                                     }
                                 },
-                                icon = { Icon(Icons.Filled.Home, contentDescription = "Home") },
-                                label = { Text("Home") },
+                                icon = { Icon(Icons.Filled.Home, contentDescription = stringResource(R.string.nav_home)) },
+                                label = { Text(stringResource(R.string.nav_home)) },
                                 alwaysShowLabel = true
                             )
                             NavigationBarItem(
@@ -103,8 +104,8 @@ class MainActivity : ComponentActivity() {
                                         launchSingleTop = true
                                     }
                                 },
-                                icon = { Icon(Icons.Filled.History, contentDescription = "History") },
-                                label = { Text("History") },
+                                icon = { Icon(Icons.Filled.History, contentDescription = stringResource(R.string.nav_history)) },
+                                label = { Text(stringResource(R.string.nav_history)) },
                                 alwaysShowLabel = true
                             )
                             NavigationBarItem(
@@ -115,8 +116,8 @@ class MainActivity : ComponentActivity() {
                                         launchSingleTop = true
                                     }
                                 },
-                                icon = { Icon(Icons.Filled.Person, contentDescription = "Profile") },
-                                label = { Text("Profile") },
+                                icon = { Icon(Icons.Filled.Person, contentDescription = stringResource(R.string.nav_profile)) },
+                                label = { Text(stringResource(R.string.nav_profile)) },
                                 alwaysShowLabel = true
                             )
 

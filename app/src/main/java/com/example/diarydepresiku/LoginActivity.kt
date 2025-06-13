@@ -13,6 +13,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
@@ -92,14 +93,14 @@ fun LoginScreen(
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("Email") },
+            label = { Text(stringResource(R.string.label_email)) },
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(Modifier.height(12.dp))
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Password") },
+            label = { Text(stringResource(R.string.label_password)) },
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth()
         )
@@ -108,21 +109,21 @@ fun LoginScreen(
             onClick = { onLogin(email, password) },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Login")
+            Text(stringResource(R.string.action_login))
         }
         Spacer(Modifier.height(8.dp))
         Button(
             onClick = onGoogle,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Sign in with Google")
+            Text(stringResource(R.string.action_sign_in_google))
         }
         Spacer(Modifier.height(8.dp))
         TextButton(
             onClick = onRegister,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Register")
+            Text(stringResource(R.string.action_register))
         }
 
         Row(
@@ -138,7 +139,7 @@ fun LoginScreen(
             )
             Spacer(Modifier.width(8.dp))
             Text(
-                text = "Privasi Anda terlindungi dengan enkripsi end-to-end.",
+                text = stringResource(R.string.privacy_message),
                 color = SoftYellow,
                 style = MaterialTheme.typography.labelSmall
             )
