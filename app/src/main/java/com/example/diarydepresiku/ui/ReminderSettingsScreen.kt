@@ -7,6 +7,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.diarydepresiku.ui.theme.SoftYellow
 import androidx.compose.material.icons.Icons
@@ -107,7 +108,7 @@ fun ReminderSettingsScreen(
             )
             Spacer(Modifier.width(4.dp))
             Text(
-                text = "Privasi Anda terlindungi dengan enkripsi end-to-end.",
+                text = stringResource(R.string.privacy_message),
                 color = SoftYellow,
                 style = MaterialTheme.typography.labelSmall
             )

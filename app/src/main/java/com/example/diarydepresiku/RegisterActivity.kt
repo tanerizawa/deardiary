@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
@@ -55,21 +56,21 @@ fun RegisterScreen(onRegister: (String, String, String) -> Unit) {
         OutlinedTextField(
             value = name,
             onValueChange = { name = it },
-            label = { Text("Name") },
+            label = { Text(stringResource(R.string.label_name)) },
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(Modifier.height(8.dp))
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("Email") },
+            label = { Text(stringResource(R.string.label_email)) },
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(Modifier.height(8.dp))
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Password") },
+            label = { Text(stringResource(R.string.label_password)) },
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth()
         )
@@ -78,7 +79,7 @@ fun RegisterScreen(onRegister: (String, String, String) -> Unit) {
             onClick = { onRegister(email, password, name) },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Register")
+            Text(stringResource(R.string.action_register))
         }
 
         Row(
@@ -94,7 +95,7 @@ fun RegisterScreen(onRegister: (String, String, String) -> Unit) {
             )
             Spacer(Modifier.width(4.dp))
             Text(
-                text = "Privasi Anda terlindungi dengan enkripsi end-to-end.",
+                text = stringResource(R.string.privacy_message),
                 color = SoftYellow,
                 style = MaterialTheme.typography.labelSmall
             )

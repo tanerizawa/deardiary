@@ -15,6 +15,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api // <<< PENTING: Untuk
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.ui.res.stringResource
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -166,7 +167,7 @@ fun DiaryFormScreen(
             )
             Spacer(Modifier.width(4.dp))
             Text(
-                text = "Privasi Anda terlindungi dengan enkripsi end-to-end.",
+                text = stringResource(R.string.privacy_message),
                 color = SoftYellow,
                 style = MaterialTheme.typography.labelSmall
             )

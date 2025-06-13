@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">diarydepresiku</string>
+    <string name="label_email">Email</string>
+    <string name="label_password">Password</string>
+    <string name="label_name">Name</string>
+    <string name="action_login">Login</string>
+    <string name="action_register">Register</string>
+    <string name="action_sign_in_google">Sign in with Google</string>
+    <string name="privacy_message">Privasi Anda terlindungi dengan enkripsi end-to-end.</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_history">History</string>
+    <string name="nav_profile">Profile</string>
 </resources>
