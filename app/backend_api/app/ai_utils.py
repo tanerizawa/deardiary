@@ -10,6 +10,7 @@ from .openrouter_client import get_openrouter_client
 
 # === Custom Error Classes ===
 
+
 class MissingAPIKeyError(RuntimeError):
     """Raised when the OPENROUTER_API_KEY is not configured."""
 
@@ -24,26 +25,39 @@ class InvalidResponseError(RuntimeError):
 
 # === Helper Functions ===
 
+
 def extract_json_from_markdown(text: str) -> str:
-    """
-    Extracts JSON content from a markdown-style block formatted with triple backticks.
+    """Return JSON payload from an OpenRouter response.
+
+    The helper first looks for a fenced code block of the form `````json```, but
+    falls back to returning the entire string when the block is not found.  This
+    mirrors the behaviour expected in the unit tests where the API may respond
+    with raw JSON without markdown formatting.
 
     Args:
-        text (str): The raw response text that may include JSON wrapped in markdown.
+        text: Raw response text from OpenRouter.
 
     Returns:
-        str: Cleaned JSON string without markdown syntax.
+        The JSON portion of the response without any markdown syntax.
 
     Raises:
-        InvalidResponseError: If JSON block is not found in the expected format.
+        InvalidResponseError: If no JSON payload could be extracted.
     """
     match = re.search(r"```json\s*(.*?)\s*```", text, re.DOTALL)
     if match:
         return match.group(1).strip()
+
+    # If the response is plain JSON, return it as-is so the caller can attempt
+    # to parse it.
+    stripped = text.strip()
+    if stripped.startswith("[") or stripped.startswith("{"):
+        return stripped
+
     raise InvalidResponseError("Tidak ditemukan blok JSON dalam respons OpenRouter.")
 
 
 # === OpenRouter Functionalities ===
+
 
 async def caption_image_with_openrouter(image_url: str) -> str:
     """
@@ -109,9 +123,9 @@ def generate_articles_with_openrouter(text: str) -> List[schemas.ArticleResponse
             {
                 "role": "user",
                 "content": (
-                        "Buat tiga judul artikel beserta ringkasan singkat dalam format JSON "
-                        "[{'title': 'Judul', 'summary': 'Ringkasan'}] tanpa tambahan penjelasan. "
-                        "Balas hanya dengan JSON.\n" + text
+                    "Buat tiga judul artikel beserta ringkasan singkat dalam format JSON "
+                    "[{'title': 'Judul', 'summary': 'Ringkasan'}] tanpa tambahan penjelasan. "
+                    "Balas hanya dengan JSON.\n" + text
                 ),
             }
         ],
@@ -126,7 +140,9 @@ def generate_articles_with_openrouter(text: str) -> List[schemas.ArticleResponse
             articles = json.loads(json_str)
         except Exception as e:
             logging.error("[OpenRouter JSON Parsing Error] Raw response: %s", text_resp)
-            raise InvalidResponseError("Invalid JSON format in OpenRouter response.") from e
+            raise InvalidResponseError(
+                "Invalid JSON format in OpenRouter response."
+            ) from e
 
         return [schemas.ArticleResponse(**a) for a in articles]
 
