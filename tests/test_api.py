@@ -119,3 +119,34 @@ def test_gemini_articles_error(client, monkeypatch):
     monkeypatch.setattr("app.main.requests.post", raise_exc)
     resp = client.post("/gemini_articles/", json={"text": "hi"})
     assert resp.status_code == 500
+
+
+def test_openrouter_caption(client, monkeypatch):
+    class MockResp:
+        def raise_for_status(self):
+            pass
+
+        def json(self):
+            return {"choices": [{"message": {"content": "A boardwalk"}}]}
+
+    monkeypatch.setenv("OPENROUTER_API_KEY", "dummy")
+    monkeypatch.setattr("app.main.requests.post", lambda *a, **k: MockResp())
+    resp = client.post(
+        "/openrouter_caption/",
+        json={"image_url": "http://example.com/img.jpg"},
+    )
+    assert resp.status_code == 200
+    assert resp.json()["caption"] == "A boardwalk"
+
+
+def test_openrouter_caption_error(client, monkeypatch):
+    def raise_exc(*args, **kwargs):
+        raise requests.RequestException("bad")
+
+    monkeypatch.setenv("OPENROUTER_API_KEY", "dummy")
+    monkeypatch.setattr("app.main.requests.post", raise_exc)
+    resp = client.post(
+        "/openrouter_caption/",
+        json={"image_url": "http://example.com/img.jpg"},
+    )
+    assert resp.status_code == 500

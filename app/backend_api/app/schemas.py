@@ -81,6 +81,18 @@ class GeminiArticleResponse(BaseModel):
     summary: str
 
 
+class OpenRouterCaptionRequest(BaseModel):
+    """Request body for describing an image via OpenRouter."""
+
+    image_url: str
+
+
+class OpenRouterCaptionResponse(BaseModel):
+    """Response schema containing the generated caption."""
+
+    caption: str
+
+
 class MoodStatsResponse(BaseModel):
     """Response schema for mood statistics."""
 

@@ -56,6 +56,45 @@ def analyze_with_gemini(text: str) -> str:
         raise RuntimeError(f"Error from Gemini API: {e}")
 
 
+def caption_image_with_openrouter(image_url: str) -> str:
+    """Return a text description of the image using OpenRouter."""
+
+    api_key = os.getenv("OPENROUTER_API_KEY")
+    if not api_key:
+        raise RuntimeError("Missing OPENROUTER_API_KEY")
+
+    payload = {
+        "model": "google/gemini-2.0-flash-exp:free",
+        "messages": [
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": "What is in this image?"},
+                    {"type": "image_url", "image_url": {"url": image_url}},
+                ],
+            }
+        ],
+    }
+
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+    }
+
+    try:
+        response = requests.post(
+            "https://openrouter.ai/api/v1/chat/completions",
+            headers=headers,
+            json=payload,
+            timeout=10,
+        )
+        response.raise_for_status()
+        data = response.json()
+        return data["choices"][0]["message"]["content"]
+    except Exception as e:
+        raise RuntimeError(f"Error from OpenRouter API: {e}")
+
+
 def generate_articles_with_gemini(text: str) -> List[schemas.GeminiArticleResponse]:
     """Request Gemini API to create article titles and summaries."""
 
@@ -158,6 +197,17 @@ def generate_articles_endpoint(request: schemas.GeminiArticleRequest):
         return generate_articles_with_gemini(request.text)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to generate articles: {e}")
+
+
+@app.post("/openrouter_caption/", response_model=schemas.OpenRouterCaptionResponse)
+def caption_image_endpoint(request: schemas.OpenRouterCaptionRequest):
+    """Generate an image caption using OpenRouter."""
+
+    try:
+        caption = caption_image_with_openrouter(request.image_url)
+        return {"caption": caption}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to caption image: {e}")
 
 
 @app.get("/stats/", response_model=schemas.MoodStatsResponse)
