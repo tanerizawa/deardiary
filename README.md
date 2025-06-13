@@ -106,13 +106,12 @@ cd diary-depresiku
 ./gradlew installDebug
 cd app/backend_api
 pip install -r requirements.txt
-export GEMINI_API_KEY=your-gemini-api-key
-export OPENROUTER_API_KEY=your-openrouter-api-key
-uvicorn app.main:app --reload
 ```
 
-Anda juga dapat menyimpan kunci di file `.env` dan memuatnya sebelum
-menjalankan backend:
+### Environment Variables
+
+Backend membutuhkan `GEMINI_API_KEY` dan `OPENROUTER_API_KEY`. Simpan keduanya di
+file `.env` lalu muat sebelum menjalankan server:
 
 ```bash
 echo "GEMINI_API_KEY=your-gemini-api-key" > .env
@@ -166,8 +165,7 @@ terikut saat commit.
 
 ## Deployment di Render
 
-Blueprint `render.yaml` tidak menyertakan nilai `GEMINI_API_KEY`. Saat menyiapkan layanan di Render, buka menu **Environment** dan tambahkan variabel ini dengan kunci Gemini Anda. Setelah disimpan, deploy blueprint seperti biasa.
-Anda juga perlu menambahkan `OPENROUTER_API_KEY` bila ingin menggunakan integrasi OpenRouter.
+Blueprint `render.yaml` tidak menyertakan kunci API. Tambahkan `GEMINI_API_KEY` dan, bila diperlukan, `OPENROUTER_API_KEY` pada menu **Environment** sebelum melakukan deploy.
 ## Kontribusi
 Kami menyambut kontribusi dari komunitas. Silakan fork repositori ini, buat branch baru, dan kirim pull request. Pedoman kontribusi tersedia di CONTRIBUTING.md.
 
