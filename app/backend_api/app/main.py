@@ -109,8 +109,6 @@ async def caption_image_endpoint(request: schemas.OpenRouterCaptionRequest):
         raise HTTPException(status_code=500, detail=f"Failed to caption image: {e}")
 
 
-
-
 @app.get("/stats/", response_model=schemas.MoodStatsResponse)
 async def read_mood_stats_endpoint(db: Session = Depends(get_db)):
     stats = crud.get_mood_stats(db)

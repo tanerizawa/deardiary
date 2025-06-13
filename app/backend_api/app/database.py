@@ -9,9 +9,7 @@ import os
 # variabel lingkungan ``SQLALCHEMY_DATABASE_URL`` didefinisikan.
 # Catatan: "sqlite:///./diary.db" berarti file diary.db ada di direktori yang
 # sama dengan tempat Anda menjalankan server.
-SQLALCHEMY_DATABASE_URL = os.getenv(
-    "SQLALCHEMY_DATABASE_URL", "sqlite:///./diary.db"
-)
+SQLALCHEMY_DATABASE_URL = os.getenv("SQLALCHEMY_DATABASE_URL", "sqlite:///./diary.db")
 
 # create_engine membuat instance engine database.
 # - connect_args={"check_same_thread": False}: Diperlukan untuk SQLite
