@@ -47,10 +47,9 @@ def extract_json_from_markdown(text: str) -> str:
     if match:
         return match.group(1).strip()
 
-    # If the response is plain JSON, return it as-is so the caller can attempt
-    # to parse it.
+    # Fall back to returning the raw text when no fenced block is found.
     stripped = text.strip()
-    if stripped.startswith("[") or stripped.startswith("{"):
+    if stripped:
         return stripped
 
     raise InvalidResponseError("Tidak ditemukan blok JSON dalam respons OpenRouter.")

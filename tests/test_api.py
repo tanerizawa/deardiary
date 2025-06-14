@@ -5,7 +5,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 import pytest
-import requests
 import httpx
 
 os.environ["SQLALCHEMY_DATABASE_URL"] = "sqlite:///:memory:"
