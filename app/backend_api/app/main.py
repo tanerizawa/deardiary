@@ -105,6 +105,8 @@ def chat(request: schemas.ChatRequest):
         return Response(content=result, media_type="text/plain")
     except MissingAPIKeyError as e:
         raise HTTPException(status_code=500, detail=f"API Key tidak ditemukan: {str(e)}")
+    except NetworkError as e:
+        raise HTTPException(status_code=502, detail=f"OpenRouter error: {str(e)}")
     except InvalidResponseError as e:
         raise HTTPException(status_code=502, detail=f"OpenRouter error: {str(e)}")
 
@@ -134,6 +136,10 @@ async def caption_image(request: schemas.OpenRouterCaptionRequest):
     try:
         caption = await caption_image_with_openrouter(request.image_url)
         return {"caption": caption}
+    except MissingAPIKeyError as e:
+        raise HTTPException(status_code=500, detail=f"API Key tidak ditemukan: {str(e)}")
+    except NetworkError as e:
+        raise HTTPException(status_code=502, detail=f"OpenRouter error: {str(e)}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Gagal membuat caption: {e}")
 
