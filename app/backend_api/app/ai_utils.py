@@ -148,3 +148,91 @@ def generate_articles_with_openrouter(text: str) -> List[schemas.ArticleResponse
 
     except Exception as e:
         raise InvalidResponseError(f"Malformed response from OpenRouter: {e}") from e
+
+
+def chat_with_openrouter(text: str, history: str | None = None, mood: str | None = None) -> str:
+    """Interact with OpenRouter to craft a follow-up question for the user.
+
+    The helper performs two requests:
+    1. Ask OpenRouter to analyze the user's message (optionally considering
+       ``history`` and ``mood``) and respond with a JSON payload containing
+       ``issue``, ``technique`` and ``tone``.
+    2. Use those values to request a final textual reply.
+
+    Parameters
+    ----------
+    text: str
+        The latest user message.
+    history: str | None
+        Previous chat history sent by the client.
+    mood: str | None
+        Current user mood if provided.
+
+    Returns
+    -------
+    str
+        The final response text from OpenRouter.
+
+    Raises
+    ------
+    MissingAPIKeyError
+        If the API key is not configured.
+    InvalidResponseError
+        If OpenRouter returns malformed or unexpected data.
+    """
+
+    try:
+        client = get_openrouter_client()
+    except RuntimeError as e:
+        raise MissingAPIKeyError(str(e)) from e
+
+    base_prompt = (
+        "Identifikasi masalah utama pengguna dan sarankan teknik coping dalam"
+        " format JSON seperti {'issue': '', 'technique': '', 'tone': ''}. "
+        "Balas hanya dengan JSON."
+    )
+
+    user_text = text
+    if history:
+        user_text += f"\nRiwayat: {history}"
+    if mood:
+        user_text += f"\nMood: {mood}"
+
+    payload_first = {
+        "model": "deepseek/deepseek-chat-v3-0324:free",
+        "messages": [
+            {"role": "user", "content": base_prompt + "\n" + user_text}
+        ],
+    }
+
+    try:
+        first = client.chat.completions.create(**payload_first)
+        raw = first.choices[0].message.content
+        json_str = extract_json_from_markdown(raw)
+        info = json.loads(json_str)
+        issue = info.get("issue")
+        technique = info.get("technique")
+        tone = info.get("tone")
+        if not all(isinstance(v, str) for v in (issue, technique, tone)):
+            raise InvalidResponseError("Missing keys in OpenRouter response")
+    except InvalidResponseError:
+        raise
+    except Exception as e:
+        logging.error("[OpenRouter JSON Parsing Error] Raw response: %s", raw)
+        raise InvalidResponseError(f"Malformed response from OpenRouter: {e}") from e
+
+    second_prompt = (
+        f"Dengan nada {tone}, buat pertanyaan singkat mengenai {issue} "
+        f"dan anjurkan {technique}."
+    )
+
+    payload_second = {
+        "model": "deepseek/deepseek-chat-v3-0324:free",
+        "messages": [{"role": "user", "content": second_prompt}],
+    }
+
+    try:
+        second = client.chat.completions.create(**payload_second)
+        return second.choices[0].message.content
+    except Exception as e:
+        raise InvalidResponseError(f"Malformed response from OpenRouter: {e}") from e
