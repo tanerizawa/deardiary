@@ -33,7 +33,8 @@ android {
         // Base URL for backend API
         buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8000/\"")
         // API keys loaded from local.properties or Gradle properties
-        buildConfigField("String", "OPENROUTER_API_KEY", "\"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\"")
+        val openRouter = secret("OPENROUTER_API_KEY") ?: ""
+        buildConfigField("String", "OPENROUTER_API_KEY", "\"$openRouter\"")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
