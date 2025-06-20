@@ -4,6 +4,9 @@ import logging
 import re
 from typing import List
 
+import httpx
+import openai
+
 from . import schemas
 from .openrouter_client import get_openrouter_client
 
@@ -94,6 +97,8 @@ async def caption_image_with_openrouter(image_url: str) -> str:
     try:
         data = await asyncio.to_thread(client.chat.completions.create, **payload)
         return data.choices[0].message.content
+    except (openai.OpenAIError, httpx.HTTPError) as e:
+        raise NetworkError(str(e)) from e
     except Exception as e:
         raise RuntimeError(f"Error from OpenRouter API: {e}") from e
 
@@ -146,6 +151,8 @@ def generate_articles_with_openrouter(text: str) -> List[schemas.ArticleResponse
 
         return [schemas.ArticleResponse(**a) for a in articles]
 
+    except (openai.OpenAIError, httpx.HTTPError) as e:
+        raise NetworkError(str(e)) from e
     except Exception as e:
         raise InvalidResponseError(f"Malformed response from OpenRouter: {e}") from e
 
@@ -217,6 +224,8 @@ def chat_with_openrouter(text: str, history: str | None = None, mood: str | None
             raise InvalidResponseError("Missing keys in OpenRouter response")
     except InvalidResponseError:
         raise
+    except (openai.OpenAIError, httpx.HTTPError) as e:
+        raise NetworkError(str(e)) from e
     except Exception as e:
         logging.error("[OpenRouter JSON Parsing Error] Raw response: %s", raw)
         raise InvalidResponseError(f"Malformed response from OpenRouter: {e}") from e
@@ -234,5 +243,7 @@ def chat_with_openrouter(text: str, history: str | None = None, mood: str | None
     try:
         second = client.chat.completions.create(**payload_second)
         return second.choices[0].message.content
+    except (openai.OpenAIError, httpx.HTTPError) as e:
+        raise NetworkError(str(e)) from e
     except Exception as e:
         raise InvalidResponseError(f"Malformed response from OpenRouter: {e}") from e

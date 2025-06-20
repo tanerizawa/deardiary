@@ -274,6 +274,38 @@ def test_openrouter_caption_error(client, monkeypatch):
     assert resp.status_code == 500
 
 
+def test_openrouter_caption_network_error(client, monkeypatch):
+    class MockClient:
+        def __init__(self):
+            self.chat = type(
+                "Chat",
+                (),
+                {
+                    "completions": type(
+                        "Comp",
+                        (),
+                        {
+                            "create": lambda self, **kw: (_ for _ in ()).throw(
+                                httpx.HTTPError("boom")
+                            )
+                        },
+                    )()
+                },
+            )()
+
+    monkeypatch.setenv("OPENROUTER_API_KEY", "dummy")
+    monkeypatch.setattr("app.ai_utils.get_openrouter_client", lambda: MockClient())
+    monkeypatch.setattr(
+        "app.openrouter_client.get_openrouter_client",
+        lambda: MockClient(),
+    )
+    resp = client.post(
+        "/openrouter_caption/",
+        json={"image_url": "http://example.com/img.jpg"},
+    )
+    assert resp.status_code == 502
+
+
 def test_openrouter_analyze(client, monkeypatch):
     class MockResp:
         def __init__(self, content="Positif"):
@@ -371,6 +403,34 @@ def test_chat_bad_json(client, monkeypatch):
                 "Chat",
                 (),
                 {"completions": type("Comp", (), {"create": lambda _s, **kw: MockResp("not-json")})()},
+            )()
+
+    monkeypatch.setenv("OPENROUTER_API_KEY", "dummy")
+    mock = MockClient()
+    monkeypatch.setattr("app.ai_utils.get_openrouter_client", lambda: mock)
+    monkeypatch.setattr("app.openrouter_client.get_openrouter_client", lambda: mock)
+
+    resp = client.post("/chat/", json={"text": "hi"})
+    assert resp.status_code == 502
+
+
+def test_chat_network_error(client, monkeypatch):
+    class MockClient:
+        def __init__(self):
+            self.chat = type(
+                "Chat",
+                (),
+                {
+                    "completions": type(
+                        "Comp",
+                        (),
+                        {
+                            "create": lambda _s, **kw: (_ for _ in ()).throw(
+                                httpx.HTTPError("boom")
+                            )
+                        },
+                    )()
+                },
             )()
 
     monkeypatch.setenv("OPENROUTER_API_KEY", "dummy")
