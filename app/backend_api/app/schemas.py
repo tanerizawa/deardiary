@@ -81,6 +81,14 @@ class ArticleResponse(BaseModel):
     summary: str
 
 
+class ChatRequest(BaseModel):
+    """Request body for the /chat/ endpoint."""
+
+    text: str = Field(..., min_length=1)
+    history: str | None = None
+    mood: str | None = None
+
+
 class OpenRouterCaptionRequest(BaseModel):
     """Request body for describing an image via OpenRouter."""
 

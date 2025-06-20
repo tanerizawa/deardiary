@@ -330,3 +330,60 @@ def test_openrouter_analyze_error(client, monkeypatch):
     )
     resp = client.post("/analyze/", json={"text": "hello"})
     assert resp.status_code == 500
+
+
+def test_chat_success(client, monkeypatch):
+    class MockResp:
+        def __init__(self, content):
+            self.choices = [type("C", (), {"message": type("M", (), {"content": content})()})]
+
+    class MockClient:
+        def __init__(self):
+            responses = [
+                MockResp('{"issue": "stress", "technique": "breathing", "tone": "calm"}'),
+                MockResp("Take a breath")
+            ]
+            self._iter = iter(responses)
+
+            def create(_self, **kw):
+                return next(self._iter)
+
+            self.chat = type("Chat", (), {"completions": type("Comp", (), {"create": create})()})()
+
+    monkeypatch.setenv("OPENROUTER_API_KEY", "dummy")
+    mock = MockClient()
+    monkeypatch.setattr("app.ai_utils.get_openrouter_client", lambda: mock)
+    monkeypatch.setattr("app.openrouter_client.get_openrouter_client", lambda: mock)
+
+    resp = client.post("/chat/", json={"text": "hi", "history": "prev"})
+    assert resp.status_code == 200
+    assert resp.text == "Take a breath"
+
+
+def test_chat_bad_json(client, monkeypatch):
+    class MockResp:
+        def __init__(self, content):
+            self.choices = [type("C", (), {"message": type("M", (), {"content": content})()})]
+
+    class MockClient:
+        def __init__(self):
+            self.chat = type(
+                "Chat",
+                (),
+                {"completions": type("Comp", (), {"create": lambda _s, **kw: MockResp("not-json")})()},
+            )()
+
+    monkeypatch.setenv("OPENROUTER_API_KEY", "dummy")
+    mock = MockClient()
+    monkeypatch.setattr("app.ai_utils.get_openrouter_client", lambda: mock)
+    monkeypatch.setattr("app.openrouter_client.get_openrouter_client", lambda: mock)
+
+    resp = client.post("/chat/", json={"text": "hi"})
+    assert resp.status_code == 502
+
+
+def test_chat_missing_key(client, monkeypatch):
+    monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
+    resp = client.post("/chat/", json={"text": "hi"})
+    assert resp.status_code == 500
+

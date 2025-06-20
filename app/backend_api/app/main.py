@@ -1,6 +1,6 @@
 # app/main.py
 
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, status, Response
 from sqlalchemy.orm import Session
 from typing import List
 from dotenv import load_dotenv
@@ -15,6 +15,7 @@ from .database import engine, get_db
 from .ai_utils import (
     caption_image_with_openrouter,
     generate_articles_with_openrouter,
+    chat_with_openrouter,
     MissingAPIKeyError,
     NetworkError,
     InvalidResponseError,
@@ -91,6 +92,21 @@ def analyze_entry(request: schemas.AnalyzeRequest):
         return {"analysis": result}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Gagal menganalisis teks: {e}")
+
+# -------------------------
+# CHAT AI
+# -------------------------
+
+@app.post("/chat/")
+def chat(request: schemas.ChatRequest):
+    """Kirim pesan pengguna ke OpenRouter dan terima balasan teks."""
+    try:
+        result = chat_with_openrouter(request.text, history=request.history, mood=request.mood)
+        return Response(content=result, media_type="text/plain")
+    except MissingAPIKeyError as e:
+        raise HTTPException(status_code=500, detail=f"API Key tidak ditemukan: {str(e)}")
+    except InvalidResponseError as e:
+        raise HTTPException(status_code=502, detail=f"OpenRouter error: {str(e)}")
 
 # -------------------------
 # ARTIKEL OTOMATIS (AI)
