@@ -162,6 +162,9 @@ NEWS_API_KEY=your-news-api-key
 OPENROUTER_API_KEY=your-openrouter-api-key
 ```
 
+Gradle akan membaca nilai tersebut melalui fungsi `secret("OPENROUTER_API_KEY")`
+di `app/build.gradle.kts` dan meneruskannya ke `buildConfigField`.
+
 File `local.properties` sudah ada di `.gitignore`, sehingga kunci rahasia tidak
 terikut saat commit.
 
